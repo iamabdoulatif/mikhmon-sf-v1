@@ -40,7 +40,7 @@ build_flat_image() {
     --change 'WORKDIR /src' \
     --change 'EXPOSE 80' \
     --change "LABEL org.opencontainers.image.title=mikhmonv3-safelinkhub" \
-    --change "LABEL org.opencontainers.image.description=Mikhmon V3 SafelinkHub for MikroTik RouterOS containers" \
+    --change "LABEL org.opencontainers.image.description=Mikhmon-V3-SafelinkHub-for-MikroTik-RouterOS-containers" \
     --change "LABEL org.opencontainers.image.version=${BUILD_VERSION}" \
     --change "LABEL org.opencontainers.image.revision=${BUILD_STAMP}" \
     - "$flat_tag" >/dev/null
