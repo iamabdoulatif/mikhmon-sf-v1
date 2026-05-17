@@ -1,0 +1,1691 @@
+/* ─────────────────────────────────────────────────────────────
+   LOGIN PAGE
+   ───────────────────────────────────────────────────────────── */
+.auth-screen {
+  background-color: #2f353a;
+  min-height: 100vh;
+}
+.portal-auth-wrap,
+.seller-login-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 72px 16px 48px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  width: min(100%, 660px);
+  max-width: 660px;
+  margin: 0 auto;
+}
+.portal-auth-wrap > .portal-auth-card,
+.portal-auth-wrap > .login-card,
+.seller-login-wrap > .portal-auth-card,
+.seller-login-wrap > .seller-login-card {
+  width: 100% !important;
+  max-width: none !important;
+}
+.portal-auth-card {
+  width: 100%;
+  margin: 0 auto !important;
+  float: none !important;
+}
+.portal-auth-card-sm { max-width: 400px; }
+.portal-auth-card-md { max-width: 620px; }
+.portal-auth-body { padding: 20px !important; }
+.portal-auth-logo {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.portal-auth-logo img {
+  max-width: 160px;
+  height: auto;
+}
+.portal-auth-logo-title {
+  display: block;
+  font-size: 22px;
+  font-weight: 700;
+  margin-top: 6px;
+}
+.portal-auth-form {
+  width: 100%;
+}
+.portal-auth-field {
+  margin-bottom: 10px;
+}
+.portal-auth-input {
+  width: 100%;
+  height: 42px !important;
+  font-size: 16px !important;
+}
+.portal-auth-submit {
+  width: 100%;
+  height: 42px !important;
+  font-size: 16px !important;
+  font-weight: 700;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.portal-auth-footer-link {
+  text-align: center;
+  margin-top: 14px;
+}
+.portal-auth-footer-link a {
+  color: #aeb7c2;
+  font-size: 13px;
+  text-decoration: none;
+}
+.login-wrap {
+  width: 100%;
+  padding: 0;
+  min-height: auto;
+  box-sizing: border-box;
+}
+.login-card {
+  width: 100%;
+  max-width: none;
+  margin: 0 auto !important;
+}
+.login-card-body { padding: 20px; }
+.login-role-row  { margin-bottom: 10px; }
+.login-tabs {
+  display: flex;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.login-tab-btn {
+  flex: 1;
+  padding: 11px 6px;
+  border: none;
+  background: none;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  transition: color .2s, border-color .2s;
+  outline: none;
+  white-space: nowrap;
+}
+.login-tab-btn i { display: block; font-size: 18px; margin-bottom: 3px; }
+.login-tab-btn.tab-admin   { color: #007bff; border-bottom-color: #007bff; }
+.login-tab-btn.tab-manager { color: #8e44ad; border-bottom-color: #8e44ad; }
+.login-tab-btn.tab-vendor  { color: #27ae60; border-bottom-color: #27ae60; }
+.login-tab-btn.inactive    { color: #aaa; }
+.login-field {
+  width: 100%;
+  height: 42px;
+  font-size: 16px;
+  padding: 0 12px;
+  box-sizing: border-box;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+.login-submit {
+  width: 100%;
+  height: 42px;
+  font-weight: bold;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: opacity .2s;
+}
+.login-submit:hover { opacity: .85; }
+.btn-admin   { background: #007bff; color: #fff; }
+.btn-manager { background: #8e44ad; color: #fff; }
+.btn-vendor  { background: #27ae60; color: #fff; }
+.login-logo  { text-align: center; margin-bottom: 18px; }
+.login-logo span { display: block; font-size: 24px; font-weight: bold; margin-top: 6px; }
+.login-logo-subtitle { font-size: 13px; font-weight: 400; opacity: .75; }
+.login-logo-contact {
+  margin-top: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #cdd6e1;
+  letter-spacing: .02em;
+}
+.login-error {
+  margin-top: 10px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.role-badge {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+  margin-top: 4px;
+}
+.badge-admin   { background: #e8f0fe; color: #007bff; }
+.badge-manager { background: #f3e8fd; color: #8e44ad; }
+.badge-vendor  { background: #e8f8ee; color: #27ae60; }
+.login-footer {
+  text-align: center;
+  padding: 14px 20px;
+  border-top: 1px solid rgba(128,128,128,.2);
+}
+.login-footer img { height: 44px; object-fit: contain; opacity: .9; }
+
+/* ─────────────────────────────────────────────────────────────
+   NAVIGATION / SIDEBAR
+   ───────────────────────────────────────────────────────────── */
+.nav-session-header {
+  border-radius: 0 !important;
+}
+.nav-vendor-icon  { }
+.nav-manager-icon { }
+.idle-timer-wrap {
+  display: inline-flex;
+  align-items: center;
+  width: 70px;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   DASHBOARD – STAT BOXES
+   ───────────────────────────────────────────────────────────── */
+.box-stat-unit {
+  font-size: 15px;
+  font-weight: normal;
+}
+.box-stat-h1 {
+  font-size: 22px !important;
+  line-height: 1.3 !important;
+}
+.vendor-analytics-row {
+  margin-bottom: 12px;
+}
+.dashboard-table-sm { font-size: 12px; }
+
+/* ─────────────────────────────────────────────────────────────
+   PERFORMANCE BAR
+   ───────────────────────────────────────────────────────────── */
+.perf-bar-cell { min-width: 170px; }
+.perf-bar-wrap {
+  background: rgba(255,255,255,.08);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+.perf-bar-fill {
+  height: 10px;
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   RECENT SALES PANEL
+   ───────────────────────────────────────────────────────────── */
+.recent-sales-box {
+  padding: 12px;
+  min-height: 100%;
+}
+.recent-sales-title {
+  margin-top: 0;
+}
+.recent-sales-empty {
+  color: #aaa;
+  margin-bottom: 0;
+}
+.recent-sales-scroll {
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   LOG BOX
+   ───────────────────────────────────────────────────────────── */
+.log-scroll-box {
+  padding: 5px;
+  overflow-y: auto;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NOTIFICATION BADGE (sidenav)
+   ───────────────────────────────────────────────────────────── */
+.notif-badge {
+  float: right;
+  background: #e74c3c;
+  color: #fff;
+  border-radius: 10px;
+  padding: 1px 7px;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 16px;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   NOTIFICATION PANEL (dashboard + stock board)
+   ───────────────────────────────────────────────────────────── */
+.notif-panel {
+  border-left: 4px solid #e74c3c;
+  background: #fff8f8;
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.notif-panel-title {
+  font-weight: bold;
+  font-size: 15px;
+  color: #c0392b;
+  margin-bottom: 10px;
+}
+.notif-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #f5c6cb;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.notif-item:last-child { margin-bottom: 0; }
+.notif-item-info {
+  flex: 1;
+  min-width: 180px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.notif-item-ts {
+  font-size: 11px;
+  color: #999;
+  display: block;
+  margin-top: 2px;
+}
+.notif-item-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn-accept {
+  background: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 7px 14px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.btn-accept:hover { opacity: .85; }
+.btn-decline {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 7px 14px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.btn-decline:hover { opacity: .85; }
+
+/* ─────────────────────────────────────────────────────────────
+   STATUS BADGE (historique demandes)
+   ───────────────────────────────────────────────────────────── */
+.badge-status {
+  display: inline-block;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.badge-status.pending  { background: #fff3cd; color: #856404; }
+.badge-status.accepted { background: #d4edda; color: #155724; }
+.badge-status.declined { background: #f8d7da; color: #721c24; }
+
+/* ─────────────────────────────────────────────────────────────
+   STOCK BOARD (vue mutuelle des vendeurs)
+   ───────────────────────────────────────────────────────────── */
+.stock-board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.stock-board-card {
+  border-radius: 10px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+.stock-board-card-self {
+  border-color: #2980b9;
+}
+.stock-board-card-header {
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  justify-content: space-between;
+}
+.stock-board-card-self .stock-board-card-header {
+  background: #eaf4fb;
+  border-bottom-color: #2980b9;
+}
+.stock-board-card-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: #111;
+}
+.stock-board-card-self-label {
+  font-size: 11px;
+  color: #2980b9;
+}
+.stock-board-total-badge {
+  border-radius: 10px;
+  padding: 2px 10px;
+  font-weight: bold;
+  font-size: 13px;
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+.stock-board-total-badge.empty {
+  background: #f5f5f5;
+  color: #bbb;
+}
+.stock-board-card-body {
+  padding: 12px 16px;
+}
+.stock-profile-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-bottom: 1px solid #f0f0f0;
+  gap: 8px;
+}
+.stock-profile-row:last-child { border-bottom: none; }
+.stock-profile-name { font-size: 13px; flex: 1; }
+.stock-profile-qty  { font-weight: bold; font-size: 14px; min-width: 30px; text-align: right; }
+.stock-profile-qty.qty-low { color: #e74c3c; }
+.stock-profile-qty.qty-ok  { color: #27ae60; }
+.stock-request-btn {
+  background: #2980b9;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: opacity .2s;
+  white-space: nowrap;
+}
+.stock-request-btn:hover { opacity: .85; }
+.stock-request-all-btn {
+  background: #8e44ad;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: opacity .2s;
+  width: 100%;
+  margin-top: 10px;
+}
+.stock-request-all-btn:hover { opacity: .85; }
+.stock-empty-note {
+  color: #aaa;
+  font-size: 13px;
+  font-style: italic;
+  padding: 6px 0;
+}
+
+/* ─────────────────────────────────────────────────────────────
+   MODAL DEMANDE DE TRANSFERT
+   ───────────────────────────────────────────────────────────── */
+#reqModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.5);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+.req-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 26px 24px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0,0,0,.2);
+}
+.req-box h3 { margin: 0 0 6px; font-size: 16px; }
+.req-box-desc { color: #555; font-size: 13px; margin-bottom: 16px; }
+.req-box label {
+  display: block;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #555;
+}
+.req-box select,
+.req-box input[type="number"] {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+  margin-bottom: 14px;
+}
+.req-box-actions { display: flex; gap: 10px; }
+.req-box-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.btn-req-send    { background: #2980b9; color: #fff; transition: opacity .2s; }
+.btn-req-send:hover { opacity: .85; }
+.btn-req-cancel  { background: #eee; color: #555; }
+
+/* ─────────────────────────────────────────────────────────────
+   ALERT MESSAGES (shared)
+   ───────────────────────────────────────────────────────────── */
+.alert-success, .alert-danger {
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+.alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+.alert-danger  { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+/* ─────────────────────────────────────────────────────────────
+   RESPONSIVE STOCK BOARD
+   ───────────────────────────────────────────────────────────── */
+@media (max-width: 750px) {
+  .notif-item { flex-direction: column; align-items: flex-start; }
+  .notif-item-actions { width: 100%; }
+  .notif-item-actions form { flex: 1; }
+  .btn-accept, .btn-decline { width: 100%; text-align: center; }
+
+  /* 1 colonne sur mobile portrait, 2 si l'écran est assez large */
+  .stock-board-grid { grid-template-columns: 1fr; }
+
+  /* Ligne profil : nom + qté sur la gauche, bouton à droite */
+  .stock-profile-row {
+    flex-wrap: wrap;
+    gap: 4px 6px;
+  }
+  .stock-profile-name { font-size: 12px; }
+  .stock-profile-qty  { font-size: 13px; }
+  .stock-request-btn  {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+
+  /* Bouton "Demander un transfert" pleine largeur */
+  .stock-request-all-btn {
+    font-size: 12px;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  /* Très petits écrans : 1 seule colonne */
+  .stock-board-grid { grid-template-columns: 1fr; }
+
+  .stock-board-card-body { padding: 10px 12px; }
+  .stock-board-card-header { padding: 10px 12px; }
+  .stock-profile-name { font-size: 12px; }
+  .stock-request-btn  { font-size: 11px; padding: 3px 7px; }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   SHARED PORTALS
+   ───────────────────────────────────────────────────────────── */
+.seller-portal #navbar,
+.manager-portal #navbar {
+  overflow: visible;
+}
+
+.seller-portal .main-container,
+.manager-portal .main-container {
+  padding: 12px 14px 16px !important;
+  box-sizing: border-box;
+}
+
+.portal-admin-shell .table-responsive,
+.portal-admin-shell .overflow,
+.seller-portal .table-responsive,
+.seller-portal .overflow,
+.manager-portal .table-responsive,
+.manager-portal .overflow {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.portal-admin-shell .overflow > .table.text-nowrap,
+.portal-admin-shell .overflow > table.text-nowrap,
+.portal-admin-shell .table-responsive > .table.text-nowrap,
+.portal-admin-shell .table-responsive > table.text-nowrap {
+  min-width: 760px;
+}
+
+.seller-summary-cards,
+.mgr-summary-cards {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px !important;
+  align-items: stretch;
+}
+
+.seller-summary-cards > div,
+.mgr-summary-cards > div {
+  min-width: 0 !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.comm-formula-row {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1.15fr);
+  align-items: stretch;
+  gap: 8px !important;
+}
+
+.comm-formula-cell {
+  min-width: 0 !important;
+  width: 100% !important;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.comm-formula-op {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  transform: none !important;
+}
+
+.mgr-quick-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.mgr-quick-actions .btn {
+  flex: 1 1 180px;
+  text-align: center;
+}
+
+.mgr-month-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.mgr-month-filter .btn {
+  background: #f4f7fb;
+  border: 1px solid #d7deea;
+  color: #243447 !important;
+}
+
+.mgr-month-filter .btn.bg-primary {
+  border-color: #2980b9;
+  color: #fff !important;
+}
+
+.ms-tab-bar {
+  display: flex;
+  gap: 10px;
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 18px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
+
+.ms-tab-bar::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ms-tab-btn {
+  flex: 0 0 auto;
+  min-width: 132px;
+  white-space: nowrap;
+}
+
+.portal-admin-shell .thead-light th,
+.portal-admin-shell .thead-light th *,
+.seller-portal .thead-light th,
+.seller-portal .thead-light th *,
+.manager-portal .thead-light th,
+.manager-portal .thead-light th *,
+.ms-tab-section .thead-light th,
+.ms-tab-section .thead-light th * {
+  color: #243447 !important;
+}
+
+.portal-help-box {
+  color: #243447 !important;
+  line-height: 1.6;
+}
+
+.portal-admin-shell .bg-light,
+.portal-admin-shell .bg-warning,
+.portal-admin-shell .bg-white,
+.seller-portal .bg-light,
+.seller-portal .bg-warning,
+.seller-portal .bg-white,
+.manager-portal .bg-light,
+.manager-portal .bg-warning,
+.manager-portal .bg-white,
+.ms-tab-section .bg-light,
+.ms-tab-section .bg-warning,
+.ms-tab-section .bg-white {
+  color: #243447 !important;
+}
+
+.portal-admin-shell .bg-light *,
+.portal-admin-shell .bg-warning *,
+.portal-admin-shell .bg-white *,
+.seller-portal .bg-light *,
+.seller-portal .bg-warning *,
+.seller-portal .bg-white *,
+.manager-portal .bg-light *,
+.manager-portal .bg-warning *,
+.manager-portal .bg-white *,
+.ms-tab-section .bg-light *,
+.ms-tab-section .bg-warning *,
+.ms-tab-section .bg-white * {
+  color: inherit;
+}
+
+.portal-admin-shell .bg-light code,
+.portal-admin-shell .bg-warning code,
+.portal-admin-shell .bg-white code,
+.seller-portal .bg-light code,
+.seller-portal .bg-warning code,
+.seller-portal .bg-white code,
+.manager-portal .bg-light code,
+.manager-portal .bg-warning code,
+.manager-portal .bg-white code,
+.ms-tab-section .bg-light code,
+.ms-tab-section .bg-warning code,
+.ms-tab-section .bg-white code {
+  color: #4b5563 !important;
+}
+
+.portal-admin-shell .bg-light small,
+.portal-admin-shell .bg-warning small,
+.portal-admin-shell .bg-white small,
+.seller-portal .bg-light small,
+.seller-portal .bg-warning small,
+.seller-portal .bg-white small,
+.manager-portal .bg-light small,
+.manager-portal .bg-warning small,
+.manager-portal .bg-white small,
+.ms-tab-section .bg-light small,
+.ms-tab-section .bg-warning small,
+.ms-tab-section .bg-white small {
+  color: #5b6472 !important;
+}
+
+.portal-muted-light {
+  color: #5b6472 !important;
+}
+
+.portal-empty-note {
+  color: #6b7280 !important;
+}
+
+.seller-summary-cards,
+.mgr-summary-cards,
+.dash-cards-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px !important;
+  align-items: stretch;
+}
+
+.seller-summary-cards > div,
+.mgr-summary-cards > div,
+.dash-cards-grid > div {
+  min-width: 0 !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+.mgr-quick-actions {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 10px !important;
+}
+
+.mgr-quick-actions .btn {
+  width: 100%;
+  min-height: 44px;
+  justify-content: center;
+}
+
+.portal-soft-accent {
+  color: #7d3c98 !important;
+}
+
+.portal-admin-shell .bg-warning,
+.portal-admin-shell .bg-light,
+.portal-admin-shell .bg-white,
+.seller-portal .bg-warning,
+.seller-portal .bg-light,
+.seller-portal .bg-white,
+.manager-portal .bg-warning,
+.manager-portal .bg-light,
+.manager-portal .bg-white,
+.portal-admin-shell [style*="background:#fff3"],
+.portal-admin-shell [style*="background:#fff8"],
+.portal-admin-shell [style*="background:#f8f1"],
+.portal-admin-shell [style*="background:#f8f9fa"],
+.portal-admin-shell [style*="background:#fdf2"],
+.portal-admin-shell [style*="background:#fdee"],
+.portal-admin-shell [style*="background:#f3e8"],
+.portal-admin-shell [style*="background:#e3f2"],
+.portal-admin-shell [style*="background:#e8f5"],
+.portal-admin-shell [style*="background:#e8f8"],
+.portal-admin-shell [style*="background:#eaf4"],
+.portal-admin-shell [style*="background:#f0f0"],
+.portal-admin-shell [style*="background:#f5f5f5"],
+.portal-admin-shell [style*="background:#fff;"],
+.portal-admin-shell [style*="background: #fff3"],
+.portal-admin-shell [style*="background: #fff8"],
+.portal-admin-shell [style*="background: #f8f1"],
+.portal-admin-shell [style*="background: #f8f9fa"],
+.portal-admin-shell [style*="background: #fdf2"],
+.portal-admin-shell [style*="background: #fdee"],
+.portal-admin-shell [style*="background: #f3e8"],
+.portal-admin-shell [style*="background: #e3f2"],
+.portal-admin-shell [style*="background: #e8f5"],
+.portal-admin-shell [style*="background: #e8f8"],
+.portal-admin-shell [style*="background: #eaf4"],
+.portal-admin-shell [style*="background: #f0f0"],
+.portal-admin-shell [style*="background: #f5f5f5"],
+.portal-admin-shell [style*="background: #fff;"] {
+  color: #243447 !important;
+}
+
+.portal-admin-shell [style*="background:#fff3"] code,
+.portal-admin-shell [style*="background:#fff8"] code,
+.portal-admin-shell [style*="background:#f8f1"] code,
+.portal-admin-shell [style*="background:#f8f9fa"] code,
+.portal-admin-shell [style*="background:#fdf2"] code,
+.portal-admin-shell [style*="background:#fdee"] code,
+.portal-admin-shell [style*="background:#f3e8"] code,
+.portal-admin-shell [style*="background:#e3f2"] code,
+.portal-admin-shell [style*="background:#e8f5"] code,
+.portal-admin-shell [style*="background:#e8f8"] code,
+.portal-admin-shell [style*="background:#eaf4"] code,
+.portal-admin-shell [style*="background:#f0f0"] code,
+.portal-admin-shell [style*="background:#f5f5f5"] code,
+.portal-admin-shell [style*="background:#fff;"] code,
+.portal-admin-shell [style*="background: #fff3"] code,
+.portal-admin-shell [style*="background: #fff8"] code,
+.portal-admin-shell [style*="background: #f8f1"] code,
+.portal-admin-shell [style*="background: #f8f9fa"] code,
+.portal-admin-shell [style*="background: #fdf2"] code,
+.portal-admin-shell [style*="background: #fdee"] code,
+.portal-admin-shell [style*="background: #f3e8"] code,
+.portal-admin-shell [style*="background: #e3f2"] code,
+.portal-admin-shell [style*="background: #e8f5"] code,
+.portal-admin-shell [style*="background: #e8f8"] code,
+.portal-admin-shell [style*="background: #eaf4"] code,
+.portal-admin-shell [style*="background: #f0f0"] code,
+.portal-admin-shell [style*="background: #f5f5f5"] code,
+.portal-admin-shell [style*="background: #fff;"] code {
+  color: #4b5563 !important;
+}
+
+.portal-admin-shell [style*="background:#fff3"] small,
+.portal-admin-shell [style*="background:#fff8"] small,
+.portal-admin-shell [style*="background:#f8f1"] small,
+.portal-admin-shell [style*="background:#f8f9fa"] small,
+.portal-admin-shell [style*="background:#fdf2"] small,
+.portal-admin-shell [style*="background:#fdee"] small,
+.portal-admin-shell [style*="background:#f3e8"] small,
+.portal-admin-shell [style*="background:#e3f2"] small,
+.portal-admin-shell [style*="background:#e8f5"] small,
+.portal-admin-shell [style*="background:#e8f8"] small,
+.portal-admin-shell [style*="background:#eaf4"] small,
+.portal-admin-shell [style*="background:#f0f0"] small,
+.portal-admin-shell [style*="background:#f5f5f5"] small,
+.portal-admin-shell [style*="background:#fff;"] small,
+.portal-admin-shell [style*="background: #fff3"] small,
+.portal-admin-shell [style*="background: #fff8"] small,
+.portal-admin-shell [style*="background: #f8f1"] small,
+.portal-admin-shell [style*="background: #f8f9fa"] small,
+.portal-admin-shell [style*="background: #fdf2"] small,
+.portal-admin-shell [style*="background: #fdee"] small,
+.portal-admin-shell [style*="background: #f3e8"] small,
+.portal-admin-shell [style*="background: #e3f2"] small,
+.portal-admin-shell [style*="background: #e8f5"] small,
+.portal-admin-shell [style*="background: #e8f8"] small,
+.portal-admin-shell [style*="background: #eaf4"] small,
+.portal-admin-shell [style*="background: #f0f0"] small,
+.portal-admin-shell [style*="background: #f5f5f5"] small,
+.portal-admin-shell [style*="background: #fff;"] small {
+  color: #5b6472 !important;
+}
+
+.portal-admin-shell .card-header,
+.seller-portal .card-header,
+.manager-portal .card-header {
+  overflow: hidden;
+}
+
+.dashboard-top-row > [class*="col-"],
+.dashboard-main-row > [class*="col-"],
+.dashboard-hotspot-grid > [class*="col-"],
+.dashboard-analytics-grid > [class*="col-"] {
+  margin-bottom: 12px;
+}
+
+.dashboard-top-row .box,
+.dashboard-main-row .box,
+.dashboard-main-row .card,
+.dashboard-hotspot-grid .box,
+.dashboard-analytics-grid .box {
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.portal-sales-table-wrap,
+.portal-ticket-table-wrap {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+.portal-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.portal-table-wrap > .table,
+.portal-table-wrap > table {
+  margin-bottom: 0;
+}
+
+.portal-sales-table,
+.portal-ticket-table {
+  min-width: 720px;
+}
+
+.portal-table-min-sm {
+  min-width: 520px;
+}
+
+.portal-table-min-md {
+  min-width: 640px;
+}
+
+.portal-table-min-lg {
+  min-width: 760px;
+}
+
+.portal-dark-muted {
+  color: #dbe7f5 !important;
+}
+
+.portal-print-panel {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.portal-print-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 10px auto 14px;
+}
+
+.portal-print-filters {
+  flex: 1 1 680px;
+  max-width: 760px;
+}
+
+.portal-print-filters .input-group {
+  margin: 0;
+}
+
+.portal-print-filters .group-item,
+.portal-print-filters .form-control {
+  width: 100%;
+  min-height: 44px;
+}
+
+.portal-print-actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.portal-print-actions .btn {
+  margin: 0 !important;
+  min-height: 44px;
+  min-width: 118px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.portal-ticket-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0 10px;
+  text-align: center;
+}
+
+.portal-ticket-meta {
+  text-align: center;
+}
+
+.portal-centered-table {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.portal-inline-note {
+  max-width: 920px;
+  margin: 0 auto 14px;
+  text-align: center;
+  line-height: 1.55;
+}
+
+.portal-admin-shell {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.portal-admin-shell img,
+.seller-portal img,
+.manager-portal img {
+  max-width: 100%;
+  height: auto;
+}
+
+.portal-admin-shell .card,
+.portal-admin-shell .box,
+.seller-portal .card,
+.seller-portal .box,
+.manager-portal .card,
+.manager-portal .box {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.portal-admin-shell .card-body,
+.portal-admin-shell .box-body,
+.seller-portal .card-body,
+.seller-portal .box-body,
+.manager-portal .card-body,
+.manager-portal .box-body {
+  overflow-wrap: anywhere;
+}
+
+.portal-admin-shell .btn,
+.seller-portal .btn,
+.manager-portal .btn {
+  max-width: 100%;
+}
+
+.portal-admin-shell .input-group,
+.seller-portal .input-group,
+.manager-portal .input-group {
+  flex-wrap: wrap;
+}
+
+.portal-admin-shell [style*="background:#f8f1ff"],
+.portal-admin-shell [style*="background:#eaf4fb"],
+.portal-admin-shell [style*="background:#fdf2e9"],
+.portal-admin-shell [style*="background:#e8f8f5"],
+.portal-admin-shell [style*="background:#fff8e1"],
+.portal-admin-shell [style*="background:#e3f2fd"],
+.portal-admin-shell [style*="background:#e8f5e9"],
+.portal-admin-shell [style*="background:#fff3e0"],
+.portal-admin-shell [style*="background:#f0f0f0"],
+.portal-admin-shell [style*="background:#f8f9fa"],
+.portal-admin-shell [style*="background:#eef6fb"],
+.portal-admin-shell [style*="background:#eee"],
+.seller-portal [style*="background:#f8f1ff"],
+.seller-portal [style*="background:#eaf4fb"],
+.seller-portal [style*="background:#fdf2e9"],
+.seller-portal [style*="background:#e8f8f5"],
+.seller-portal [style*="background:#fff8e1"],
+.seller-portal [style*="background:#e3f2fd"],
+.seller-portal [style*="background:#e8f5e9"],
+.seller-portal [style*="background:#fff3e0"],
+.seller-portal [style*="background:#f0f0f0"],
+.seller-portal [style*="background:#f8f9fa"],
+.seller-portal [style*="background:#eef6fb"],
+.seller-portal [style*="background:#eee"],
+.manager-portal [style*="background:#f8f1ff"],
+.manager-portal [style*="background:#eaf4fb"],
+.manager-portal [style*="background:#fdf2e9"],
+.manager-portal [style*="background:#e8f8f5"],
+.manager-portal [style*="background:#fff8e1"],
+.manager-portal [style*="background:#e3f2fd"],
+.manager-portal [style*="background:#e8f5e9"],
+.manager-portal [style*="background:#fff3e0"],
+.manager-portal [style*="background:#f0f0f0"],
+.manager-portal [style*="background:#f8f9fa"],
+.manager-portal [style*="background:#eef6fb"],
+.manager-portal [style*="background:#eee"] {
+  color: #243447 !important;
+}
+
+.portal-admin-shell [style*="background:#f8f1ff"] *,
+.portal-admin-shell [style*="background:#eaf4fb"] *,
+.portal-admin-shell [style*="background:#fdf2e9"] *,
+.portal-admin-shell [style*="background:#e8f8f5"] *,
+.portal-admin-shell [style*="background:#fff8e1"] *,
+.portal-admin-shell [style*="background:#e3f2fd"] *,
+.portal-admin-shell [style*="background:#e8f5e9"] *,
+.portal-admin-shell [style*="background:#fff3e0"] *,
+.portal-admin-shell [style*="background:#f0f0f0"] *,
+.portal-admin-shell [style*="background:#f8f9fa"] *,
+.portal-admin-shell [style*="background:#eef6fb"] *,
+.portal-admin-shell [style*="background:#eee"] *,
+.seller-portal [style*="background:#f8f1ff"] *,
+.seller-portal [style*="background:#eaf4fb"] *,
+.seller-portal [style*="background:#fdf2e9"] *,
+.seller-portal [style*="background:#e8f8f5"] *,
+.seller-portal [style*="background:#fff8e1"] *,
+.seller-portal [style*="background:#e3f2fd"] *,
+.seller-portal [style*="background:#e8f5e9"] *,
+.seller-portal [style*="background:#fff3e0"] *,
+.seller-portal [style*="background:#f0f0f0"] *,
+.seller-portal [style*="background:#f8f9fa"] *,
+.seller-portal [style*="background:#eef6fb"] *,
+.seller-portal [style*="background:#eee"] *,
+.manager-portal [style*="background:#f8f1ff"] *,
+.manager-portal [style*="background:#eaf4fb"] *,
+.manager-portal [style*="background:#fdf2e9"] *,
+.manager-portal [style*="background:#e8f8f5"] *,
+.manager-portal [style*="background:#fff8e1"] *,
+.manager-portal [style*="background:#e3f2fd"] *,
+.manager-portal [style*="background:#e8f5e9"] *,
+.manager-portal [style*="background:#fff3e0"] *,
+.manager-portal [style*="background:#f0f0f0"] *,
+.manager-portal [style*="background:#f8f9fa"] *,
+.manager-portal [style*="background:#eef6fb"] *,
+.manager-portal [style*="background:#eee"] * {
+  color: inherit !important;
+}
+
+.portal-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.portal-toolbar-group {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.portal-section-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.portal-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.portal-chip-blue { background: #e8f0fe; color: #1f5fbf; }
+.portal-chip-green { background: #e8f8ee; color: #1f8b4c; }
+.portal-chip-purple { background: #f3e8fd; color: #7d3c98; }
+.portal-chip-orange { background: #fff0df; color: #c56a16; }
+
+.portal-note-card {
+  background: rgba(255,255,255,0.96);
+  color: #243447 !important;
+  border: 1px solid rgba(148, 163, 184, 0.24);
+  border-radius: 16px;
+  padding: 16px 18px;
+  line-height: 1.65;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.06);
+}
+
+.portal-card-section {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 18px;
+  padding: 22px;
+}
+
+.portal-card-section-tight {
+  padding: 18px;
+}
+
+.portal-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.portal-filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.portal-filter-item-wide {
+  grid-column: 1 / -1;
+}
+
+.portal-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  align-items: stretch;
+}
+
+.portal-summary-card {
+  border-radius: 18px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 132px;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+}
+
+.portal-summary-card-blue {
+  background: linear-gradient(180deg, #eef5ff 0%, #dfeeff 100%);
+  color: #154c8c;
+}
+
+.portal-summary-card-green {
+  background: linear-gradient(180deg, #eefcf2 0%, #daf5e2 100%);
+  color: #1d7f45;
+}
+
+.portal-summary-card-violet {
+  background: linear-gradient(180deg, #f7efff 0%, #ebdbff 100%);
+  color: #6b2da0;
+}
+
+.portal-summary-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.portal-summary-value {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.portal-summary-sub {
+  font-size: 14px;
+  line-height: 1.4;
+  opacity: 0.9;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-main-row > .col-8,
+  .dashboard-main-row > .col-4 {
+    width: 100%;
+  }
+
+  .comm-formula-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .comm-formula-op {
+    min-height: 18px;
+    font-size: 20px !important;
+    opacity: 0.35 !important;
+  }
+}
+
+@media (max-width: 750px) {
+  .seller-portal .main-container,
+  .manager-portal .main-container {
+    padding: 10px 12px 14px !important;
+  }
+
+  .overflow > .table.text-nowrap,
+  .overflow > table.text-nowrap,
+  .table-responsive > .table.text-nowrap,
+  .table-responsive > table.text-nowrap {
+    min-width: 760px;
+  }
+
+  /* Navbar ligne unique sur mobile : le contenu n'est plus caché derrière */
+  .seller-portal #navbar,
+  .manager-portal #navbar {
+    height: 50px !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+    overflow: visible;
+  }
+
+  .seller-portal #navbar .navbar-left,
+  .manager-portal #navbar .navbar-left {
+    display: flex;
+    width: auto !important;
+    flex: 1;
+    flex-wrap: nowrap;
+    gap: 4px;
+    align-items: center;
+  }
+
+  .seller-portal #navbar .navbar-right,
+  .manager-portal #navbar .navbar-right {
+    display: flex;
+    width: auto !important;
+    flex-wrap: nowrap;
+    gap: 0;
+    align-items: center;
+    justify-content: flex-end;
+    padding-left: 0;
+  }
+
+  /* Texte des liens navbar compacté sur mobile */
+  .seller-portal #navbar .navbar-right a,
+  .manager-portal #navbar .navbar-right a {
+    padding: 14px 10px;
+    font-size: 13px;
+  }
+
+  /* Force le hamburger toujours visible sur mobile — le dark-theme JS le cache
+     avec un style inline quand le sidenav s'ouvre ; !important l'écrase. */
+  .seller-portal #openNav,
+  .manager-portal #openNav {
+    display: block !important;
+  }
+
+  /* #closeNav n'est pas utilisé dans le portail vendeur/manager sur mobile
+     (c'est #closeSidenav et l'overlay qui gèrent la fermeture). */
+  .seller-portal #closeNav,
+  .manager-portal #closeNav {
+    display: none !important;
+  }
+
+  /* Affiche le titre de page courante dans la navbar sur mobile */
+  .seller-portal #cpage,
+  .manager-portal #cpage {
+    display: block !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+    font-size: 13px;
+  }
+
+  .dashboard-top-row > .col-4,
+  .dashboard-hotspot-grid > .col-3,
+  .dashboard-analytics-grid > .col-4 {
+    width: 50%;
+  }
+
+  .seller-summary-cards,
+  .mgr-summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-print-filters,
+  .portal-print-actions {
+    flex-basis: 100%;
+    max-width: 100%;
+  }
+
+  .portal-print-filters .input-group-4,
+  .portal-print-filters .col-box-4 {
+    width: 100% !important;
+  }
+
+  .portal-print-filters .group-item {
+    border-radius: 5px !important;
+  }
+
+  .portal-print-actions .btn {
+    flex: 1 1 calc(33.333% - 10px);
+    min-width: 0;
+  }
+
+  .portal-sales-table-wrap,
+  .portal-ticket-table-wrap {
+    max-height: none !important;
+  }
+
+  .mgr-quick-actions .btn,
+  .mgr-month-filter .btn {
+    flex: 1 1 100%;
+  }
+
+  .ms-tab-bar {
+    margin: 0 -4px 18px;
+    padding: 0 4px 8px;
+  }
+
+  .portal-ticket-header,
+  .portal-ticket-meta {
+    text-align: left;
+  }
+
+  .portal-filter-grid,
+  .portal-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-admin-shell .row > [class*="col-"],
+  .seller-portal .row > [class*="col-"],
+  .manager-portal .row > [class*="col-"] {
+    width: 100%;
+  }
+
+  .portal-toolbar,
+  .portal-toolbar-group {
+    justify-content: center;
+  }
+
+  .portal-section-title {
+    width: 100%;
+  }
+
+  .ms-tab-btn {
+    min-width: 116px;
+    font-size: 12px;
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .portal-print-actions .btn {
+    flex-basis: 100%;
+  }
+
+  .seller-portal .main-container,
+  .manager-portal .main-container {
+    padding: 8px 10px 12px !important;
+  }
+
+  .ms-tab-btn {
+    min-width: 102px;
+    font-size: 11px;
+    padding: 8px 10px;
+  }
+
+  .dashboard-top-row > .col-4,
+  .dashboard-hotspot-grid > .col-3,
+  .dashboard-analytics-grid > .col-4 {
+    width: 100%;
+  }
+
+  .seller-portal .dash-cards-grid,
+  .manager-portal .dash-cards-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .portal-summary-value {
+    font-size: 32px;
+  }
+
+  .login-tab-btn { font-size: 12px; padding: 9px 2px; }
+  .login-tab-btn i { font-size: 15px; }
+  .portal-auth-wrap,
+  .seller-login-wrap {
+    padding-top: 24px;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .portal-auth-card,
+  .login-card {
+    width: min(100%, 100%);
+  }
+}
+
+/* ── Sidenav menu items — spacing, hover & click feedback ─────────────────
+   Overrides the dark-theme min.css defaults for seller & manager portals.  */
+.seller-portal .sidenav a.menu,
+.manager-portal .sidenav a.menu {
+  display: flex !important;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px !important;
+  margin: 2px 8px !important;
+  border-radius: 8px !important;
+  border-left: 3px solid transparent !important;
+  color: #b8bec3 !important;
+  font-size: 13.5px !important;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background .18s, color .18s, transform .15s, box-shadow .18s !important;
+  user-select: none;
+}
+
+.seller-portal .sidenav a.menu i,
+.manager-portal .sidenav a.menu i {
+  font-size: 15px;
+  width: 18px;
+  text-align: center;
+  flex-shrink: 0;
+  opacity: .65;
+  transition: opacity .18s, transform .15s;
+}
+
+/* Hover */
+.seller-portal .sidenav a.menu:hover,
+.manager-portal .sidenav a.menu:hover {
+  background: rgba(255, 255, 255, .07) !important;
+  color: #e4e7ea !important;
+  border-left-color: #20a8d8 !important;
+  transform: translateX(3px);
+}
+.seller-portal .sidenav a.menu:hover i,
+.manager-portal .sidenav a.menu:hover i {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+/* Click / press */
+.seller-portal .sidenav a.menu:active,
+.manager-portal .sidenav a.menu:active {
+  background: rgba(32, 168, 216, .22) !important;
+  transform: translateX(2px) scale(.98);
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, .25);
+}
+
+/* Active page */
+.seller-portal .sidenav a.menu.active,
+.manager-portal .sidenav a.menu.active {
+  background: rgba(32, 168, 216, .18) !important;
+  color: #20a8d8 !important;
+  font-weight: 600;
+  border-left-color: #20a8d8 !important;
+}
+.seller-portal .sidenav a.menu.active i,
+.manager-portal .sidenav a.menu.active i {
+  opacity: 1;
+  color: #20a8d8;
+}
+
+/* Logout item */
+.seller-portal .sidenav a.menu[href*="logout"],
+.manager-portal .sidenav a.menu[href*="logout"] {
+  color: #e07070 !important;
+  margin-top: 4px !important;
+}
+.seller-portal .sidenav a.menu[href*="logout"] i,
+.manager-portal .sidenav a.menu[href*="logout"] i {
+  color: #e07070;
+  opacity: .8;
+}
+.seller-portal .sidenav a.menu[href*="logout"]:hover,
+.manager-portal .sidenav a.menu[href*="logout"]:hover {
+  background: rgba(231, 76, 60, .12) !important;
+  border-left-color: #e74c3c !important;
+  color: #e74c3c !important;
+}
+.seller-portal .sidenav a.menu[href*="logout"]:active,
+.manager-portal .sidenav a.menu[href*="logout"]:active {
+  background: rgba(231, 76, 60, .22) !important;
+}
+
+/* IP Binding duration form */
+.ipbind-duration-panel {
+  padding: 12px;
+}
+
+.ipbind-duration-form {
+  width: 100%;
+}
+
+.ipbind-duration-grid {
+  display: grid;
+  grid-template-columns: minmax(170px, 1.35fr) repeat(5, minmax(120px, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.ipbind-field {
+  min-width: 0;
+}
+
+.ipbind-field label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.ipbind-field .form-control,
+.ipbind-actions .btn {
+  min-height: 34px;
+}
+
+.ipbind-field .form-control {
+  width: 100%;
+}
+
+.ipbind-field-note {
+  grid-column: span 4;
+}
+
+.ipbind-actions {
+  display: flex;
+  align-items: flex-end;
+}
+
+.ipbind-actions .btn {
+  width: 100%;
+  margin: 0;
+}
+
+.ipbind-search {
+  max-width: 420px;
+}
+
+.ipbind-table-wrap {
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1100px) {
+  .ipbind-duration-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .ipbind-field-mac,
+  .ipbind-field-note,
+  .ipbind-actions {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .ipbind-duration-panel {
+    padding: 10px;
+  }
+
+  .ipbind-duration-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 9px;
+  }
+
+  .ipbind-field,
+  .ipbind-field-mac,
+  .ipbind-field-note,
+  .ipbind-actions {
+    grid-column: 1;
+  }
+
+  .ipbind-field label {
+    font-size: 12.5px;
+  }
+
+  .ipbind-field .form-control,
+  .ipbind-actions .btn {
+    min-height: 40px;
+    font-size: 15px;
+  }
+
+  .ipbind-search {
+    width: 100%;
+    max-width: none;
+  }
+
+  .ipbind-table-wrap {
+    max-height: 62vh !important;
+  }
+}

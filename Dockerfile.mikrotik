@@ -1,0 +1,38 @@
+FROM --platform=$TARGETPLATFORM php:7.4-cli-alpine3.16
+
+ARG TARGETPLATFORM
+ARG BUILD_VERSION=dev
+ARG BUILD_STAMP=unknown
+
+LABEL org.opencontainers.image.title="mikhmonv3-safelinkhub"
+LABEL org.opencontainers.image.description="Mikhmon V3 SafelinkHub for MikroTik RouterOS containers"
+LABEL org.opencontainers.image.version="${BUILD_VERSION}"
+LABEL org.opencontainers.image.revision="${BUILD_STAMP}"
+
+WORKDIR /src
+
+COPY . /src/src/
+
+RUN rm -rf \
+      /usr/local/bin/phpdbg \
+      /usr/local/include/php \
+      /usr/local/lib/php/build \
+      /usr/local/lib/php/doc \
+      /usr/local/lib/php/test \
+      /usr/local/php \
+      /tmp/* \
+      /var/cache/apk/* \
+      /src/src/tools \
+      /src/src/.dockerignore \
+      /src/src/.gitignore \
+      /src/src/.github \
+      /src/src/tests \
+      /src/src/wireguard-configs/* \
+    && mkdir -p /src/src/logs /src/src/img /src/src/wireguard-configs \
+    && find /src/src -type d -exec chmod 755 {} + \
+    && find /src/src -type f -exec chmod 644 {} +
+
+EXPOSE 80
+
+ENTRYPOINT ["php"]
+CMD ["-S", "0.0.0.0:80", "-t", "/src/src/"]

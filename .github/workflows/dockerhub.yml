@@ -1,0 +1,42 @@
+name: Build and push DockerHub images
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  IMAGE_NAME: latif225/mikhmonv3-safelinkhub
+  DOCKERFILE: Dockerfile.mikrotik
+
+jobs:
+  flattened-routeros-images:
+    name: Flattened RouterOS images
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Install skopeo
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y skopeo
+
+      - name: Build, flatten and push
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          BUILD_STAMP: ${{ github.run_number }}-${{ github.sha }}
+          BUILD_VERSION: github-${{ github.run_number }}
+        run: bash tools/ci-build-push-flattened.sh
