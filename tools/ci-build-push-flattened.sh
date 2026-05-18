@@ -59,13 +59,18 @@ push_flat_image() {
   elif [[ "$platform" == "linux/arm64" ]]; then
     override_args=(--override-os linux --override-arch arm64)
   fi
+  local compression_args=(
+    --dest-compress
+    --dest-compress-format gzip
+    --dest-compress-level 9
+  )
+  if skopeo copy --help 2>&1 | grep -q -- '--dest-force-compress-format'; then
+    compression_args+=(--dest-force-compress-format)
+  fi
 
   skopeo copy \
     "${override_args[@]}" \
-    --dest-compress \
-    --dest-compress-format gzip \
-    --dest-compress-level 9 \
-    --dest-force-compress-format \
+    "${compression_args[@]}" \
     --dest-creds "${DOCKERHUB_USERNAME}:${DOCKERHUB_TOKEN}" \
     "docker-daemon:${source_tag}" \
     "docker://${IMAGE_NAME}:${dest_tag}"
