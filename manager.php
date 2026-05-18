@@ -706,7 +706,8 @@ $managerOverviewUrl = './manager.php?action=overview&idbl=' . strtolower(date("M
     <div class="card-body portal-auth-body">
       <div class="portal-auth-logo">
         <img src="img/favicon.png" alt="MIKHMON Logo">
-        <div class="portal-auth-logo-title">MIKHMON</div>
+        <span class="portal-auth-logo-title">MIKHMON <small class="login-logo-subtitle">BY Safelink Africa</small></span>
+        <div class="login-logo-contact">+2250709100552</div>
         <span class="mgr-badge"><i class="fa fa-briefcase"></i> <?= isset($_manager) ? $_manager : 'Manager' ?></span>
       </div>
       <form autocomplete="off" action="" method="post" class="portal-auth-form">
@@ -725,6 +726,9 @@ $managerOverviewUrl = './manager.php?action=overview&idbl=' . strtolower(date("M
       <div class="portal-auth-footer-link">
         <a href="./admin.php?id=login">← <?= isset($_please_login) ? $_please_login : 'Login' ?></a>
       </div>
+    </div>
+    <div class="card-footer login-footer">
+      <img src="img/safelink-africa.png" alt="SafeLink Africa">
     </div>
   </div>
 </div>
