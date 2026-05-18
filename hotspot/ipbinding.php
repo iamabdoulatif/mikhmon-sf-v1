@@ -151,8 +151,8 @@ if ($countbinding < 2) {
 				<input class="form-control" type="text" name="binding_mac" placeholder="AA:BB:CC:DD:EE:FF" required>
 			</div>
 			<div class="ipbind-field">
-				<label>Address</label>
-				<input class="form-control" type="text" name="binding_address" placeholder="10.10.0.44">
+				<label>Address <span class="ipbind-optional">(optionnel)</span></label>
+				<input class="form-control" type="text" name="binding_address" placeholder="optionnel">
 			</div>
 			<div class="ipbind-field">
 				<label>To Address</label>

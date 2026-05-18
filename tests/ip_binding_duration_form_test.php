@@ -49,6 +49,7 @@ $checks = array(
     'responsive panel' => 'ipbind-duration-panel',
     'responsive grid' => 'ipbind-duration-grid',
     'mac field' => 'name="binding_mac"',
+    'optional address placeholder' => 'name="binding_address" placeholder="optionnel"',
     'profile select' => 'id="bindingProfile"',
     'duration field' => 'id="bindingDuration"',
     'profile validity' => 'data-validity="45m"',
@@ -60,6 +61,18 @@ foreach ($checks as $label => $needle) {
         fwrite(STDERR, $label . ' missing from IP Binding duration form' . PHP_EOL);
         exit(1);
     }
+}
+
+$addressInputPos = strpos($html, 'name="binding_address"');
+if ($addressInputPos === false) {
+    fwrite(STDERR, 'address input missing from IP Binding form' . PHP_EOL);
+    exit(1);
+}
+$addressInputEnd = strpos($html, '>', $addressInputPos);
+$addressInput = substr($html, $addressInputPos, $addressInputEnd - $addressInputPos);
+if (strpos($addressInput, 'required') !== false) {
+    fwrite(STDERR, 'address input must be optional' . PHP_EOL);
+    exit(1);
 }
 
 echo "ip_binding_duration_form_test passed\n";

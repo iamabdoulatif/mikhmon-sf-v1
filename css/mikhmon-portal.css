@@ -1672,12 +1672,14 @@
 
   .ipbind-field label {
     font-size: 12.5px;
+    text-align: center;
   }
 
   .ipbind-field .form-control,
   .ipbind-actions .btn {
     min-height: 40px;
     font-size: 15px;
+    text-align: center;
   }
 
   .ipbind-search {
@@ -1685,7 +1687,22 @@
     max-width: none;
   }
 
+  .ipbind-search .form-control {
+    text-align: center;
+  }
+
   .ipbind-table-wrap {
     max-height: 62vh !important;
+  }
+
+  .ipbind-table-wrap th,
+  .ipbind-table-wrap td {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .login-tabs,
+  .login-tab-btn {
+    text-align: center;
   }
 }

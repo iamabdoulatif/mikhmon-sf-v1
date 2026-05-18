@@ -11,6 +11,9 @@ $checks = array(
     'single mobile column' => 'grid-template-columns: minmax(0, 1fr)',
     'touch table scrolling' => '-webkit-overflow-scrolling: touch',
     'full-width mobile search' => '.ipbind-search',
+    'centered mobile text' => 'text-align: center;',
+    'centered mobile table headers' => '.ipbind-table-wrap th',
+    'centered mobile table cells' => '.ipbind-table-wrap td',
 );
 
 foreach ($checks as $label => $needle) {

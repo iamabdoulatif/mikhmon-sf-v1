@@ -62,6 +62,10 @@ push_flat_image() {
 
   skopeo copy \
     "${override_args[@]}" \
+    --dest-compress \
+    --dest-compress-format gzip \
+    --dest-compress-level 9 \
+    --dest-force-compress-format \
     --dest-creds "${DOCKERHUB_USERNAME}:${DOCKERHUB_TOKEN}" \
     "docker-daemon:${source_tag}" \
     "docker://${IMAGE_NAME}:${dest_tag}"
@@ -76,4 +80,4 @@ push_flat_image "mikhmon-flat:armv7" "arm32" "linux/arm/v7"
 build_flat_image "linux/arm64" "mikhmon-build:arm64" "mikhmon-flat:arm64" "mikhmon_flat_arm64_${BUILD_STAMP}"
 push_flat_image "mikhmon-flat:arm64" "arm64" "linux/arm64"
 
-echo "Pushed flattened images to ${IMAGE_NAME}: arm32, armv7, arm64"
+echo "Pushed flattened compressed images to ${IMAGE_NAME}: arm32, armv7, arm64"
