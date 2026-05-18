@@ -41,3 +41,12 @@ jobs:
           BUILD_VERSION: github-${{ github.run_number }}
           MANIFEST_TAGS: latest v1
         run: bash tools/ci-build-push-flattened.sh
+
+      - name: Update DockerHub description
+        uses: peter-evans/dockerhub-description@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: latif225/mikhmonv3-safelinkhub
+          short-description: Mikhmon v3 pour MikroTik Hotspot: vouchers, revenus, expiration et IP Binding temporise.
+          readme-filepath: ./dockerhub/README.md
