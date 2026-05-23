@@ -26,6 +26,7 @@ include('./settings/setlang.php');
 include('./include/sellers_config.php');
 include_once('./include/seller_ticket_helper.php');
 include_once('./include/accounting_notifications.php');
+include_once('./include/accounting_expenses.php');
 include('./include/managers_config.php');
 include_once('./include/auth.php');
 include_once('./include/csrf.php');
@@ -537,6 +538,30 @@ $managerOverviewUrl = './manager.php?action=overview&idbl=' . strtolower(date("M
 $managerAccountingUrl = './manager.php?action=accounting&idbl=' . urlencode($accountingMonthKey);
 $accountingNoticeMsg = '';
 $accountingNoticeError = '';
+$accountingExpenseMsg = '';
+$accountingExpenseError = '';
+$accountingExpensesSession = isset($manager_session_name) ? $manager_session_name : (isset($session) ? $session : '');
+$accountingAllExpenses = mikhmon_accounting_expenses_load();
+if ($manager_logged_in && $action === 'accounting' && isset($_POST['add_accounting_expense'])) {
+    csrf_guard();
+    $expenseDate = isset($_POST['expense_date']) ? $_POST['expense_date'] : $accountingTo;
+    $expenseType = isset($_POST['expense_type']) ? $_POST['expense_type'] : 'Autre';
+    $expenseLabel = isset($_POST['expense_label']) ? $_POST['expense_label'] : '';
+    $expenseAmount = isset($_POST['expense_amount']) ? $_POST['expense_amount'] : 0;
+    $expenseRecord = mikhmon_accounting_expense_record($accountingExpensesSession, $expenseDate, $expenseType, $expenseLabel, $expenseAmount);
+    if ($expenseRecord['amount'] <= 0) {
+        $accountingExpenseError = 'Le montant de la dépense doit être supérieur à zéro.';
+    } else {
+        $accountingAllExpenses[] = $expenseRecord;
+        if (mikhmon_accounting_expenses_save($accountingAllExpenses)) {
+            $accountingExpenseMsg = 'Dépense ajoutée au compte du gérant.';
+        } else {
+            $accountingExpenseError = 'Impossible d’enregistrer la dépense.';
+        }
+    }
+}
+$accountingPeriodExpenses = mikhmon_accounting_expenses_for_period($accountingAllExpenses, $accountingExpensesSession, $accountingFrom, $accountingTo);
+$accountingExpensesTotal = mikhmon_accounting_expenses_total($accountingPeriodExpenses);
 $accountingNoticeTargets = mikhmon_accounting_notification_targets($accountingSummary, $managerSellersData, $accountingSeller);
 $accountingNoticeTotals = mikhmon_accounting_notice_totals_for_targets($accountingSummary, $accountingNoticeTargets, $currency, $cekindo);
 if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_accounting_notice'])) {
@@ -665,6 +690,33 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
   color:#243447;
   line-height:1.45;
   margin:10px 0;
+}
+.mgr-expense-box {
+  border:1px solid #d7deea;
+  border-left:4px solid #c0392b;
+  border-radius:8px;
+  background:#fffafa;
+  padding:14px 16px;
+  margin-bottom:16px;
+}
+.mgr-expense-form {
+  display:grid;
+  grid-template-columns:repeat(4, minmax(0, 1fr));
+  gap:10px;
+  align-items:end;
+  margin:12px 0;
+}
+.mgr-expense-form .form-control {
+  width:100%;
+  min-width:0;
+  box-sizing:border-box;
+}
+.mgr-expense-list {
+  margin-bottom:0;
+}
+.mgr-expense-list th,
+.mgr-expense-list td {
+  vertical-align:middle !important;
 }
 .mgr-month-filter {
   display:flex;
@@ -1363,6 +1415,8 @@ if (in_array($action, ['overview','accounting'])) {
       $acctSellerLabel = $accountingSeller !== '' && isset($managerSellersData[$accountingSeller])
         ? $managerSellersData[$accountingSeller]['name']
         : 'Tous les vendeurs';
+      $accountingExpensesDeducted = ($accountingSeller === '');
+      $acctNetAfterExpenses = $accountingExpensesDeducted ? mikhmon_accounting_net_after_expenses($acctTotal, $accountingPeriodExpenses) : $acctTotal['net'];
     ?>
     <div class="mgr-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
       <div style="flex:1;min-width:170px;background:#eaf4fb;border-radius:8px;padding:14px 16px;border-left:4px solid #2980b9;">
@@ -1386,10 +1440,93 @@ if (in_array($action, ['overview','accounting'])) {
         <div style="font-size:11px;color:#c0398f;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-bank"></i> Net à remettre</div>
         <div style="font-size:22px;font-weight:bold;color:#c0398f;"><?= mikhmon_format_money_amount($acctTotal['net'], $currency, $cekindo) ?></div>
       </div>
+      <div style="flex:1;min-width:150px;background:#fff1f0;border-radius:8px;padding:14px 16px;border-left:4px solid #c0392b;">
+        <div style="font-size:11px;color:#c0392b;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-minus-circle"></i> Dépenses</div>
+        <div style="font-size:22px;font-weight:bold;color:#c0392b;"><?= mikhmon_format_money_amount($accountingExpensesTotal, $currency, $cekindo) ?></div>
+      </div>
+      <div style="flex:1;min-width:150px;background:#ecfdf3;border-radius:8px;padding:14px 16px;border-left:4px solid #15803d;">
+        <div style="font-size:11px;color:#15803d;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-calculator"></i> Net après dépenses</div>
+        <div style="font-size:22px;font-weight:bold;color:#15803d;"><?= mikhmon_format_money_amount($acctNetAfterExpenses, $currency, $cekindo) ?></div>
+        <?php if (!$accountingExpensesDeducted): ?>
+          <div style="font-size:11px;color:#64748b;">Non déduit du vendeur sélectionné</div>
+        <?php endif; ?>
+      </div>
       <div style="flex:1;min-width:150px;background:#eef2f7;border-radius:8px;padding:14px 16px;border-left:4px solid #34495e;">
         <div style="font-size:11px;color:#34495e;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-clock-o"></i> Plage horaire</div>
         <div style="font-size:22px;font-weight:bold;color:#34495e;"><?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?> → <?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?></div>
       </div>
+    </div>
+
+    <div class="mgr-expense-box">
+      <b><i class="fa fa-credit-card"></i> Dépenses du gérant</b>
+      <div style="font-size:12px;color:#64748b;margin-top:4px;">
+        Les dépenses datées dans cette période sont déduites de la vente globale lorsque tous les vendeurs sont affichés.
+      </div>
+      <?php if ($accountingExpenseMsg !== ''): ?>
+        <div class="bg-success" style="padding:8px 10px;border-radius:5px;margin-top:10px;"><i class="fa fa-check"></i> <?= htmlspecialchars($accountingExpenseMsg) ?></div>
+      <?php endif; ?>
+      <?php if ($accountingExpenseError !== ''): ?>
+        <div class="bg-warning" style="padding:8px 10px;border-radius:5px;margin-top:10px;"><i class="fa fa-warning"></i> <?= htmlspecialchars($accountingExpenseError) ?></div>
+      <?php endif; ?>
+      <form method="post" action="./manager.php?action=accounting&idbl=<?= urlencode($accountingMonthKey) ?>&from=<?= urlencode($accountingFrom) ?>&to=<?= urlencode($accountingTo) ?>&settled_at=<?= urlencode($accountingSettlementTime) ?>&next_settled_at=<?= urlencode($accountingNextSettlementTime) ?><?= $accountingSeller !== '' ? '&seller=' . urlencode($accountingSeller) : '' ?>" class="mgr-expense-form">
+        <?= csrf_field() ?>
+        <div>
+          <label class="transfer-label"><i class="fa fa-calendar-o"></i> Date dépense</label>
+          <input type="date" name="expense_date" class="form-control" value="<?= htmlspecialchars($accountingTo) ?>" required>
+        </div>
+        <div>
+          <label class="transfer-label"><i class="fa fa-tags"></i> Type</label>
+          <select name="expense_type" class="form-control" required>
+            <?php foreach (mikhmon_accounting_expense_types() as $expenseType): ?>
+              <option value="<?= htmlspecialchars($expenseType) ?>"><?= htmlspecialchars($expenseType) ?></option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+        <div>
+          <label class="transfer-label"><i class="fa fa-pencil"></i> Libellé</label>
+          <input type="text" name="expense_label" class="form-control" placeholder="Ex: Facture CIE avril" maxlength="120">
+        </div>
+        <div>
+          <label class="transfer-label"><i class="fa fa-money"></i> Montant</label>
+          <input type="number" name="expense_amount" class="form-control" min="1" step="1" placeholder="0" required>
+        </div>
+        <button type="submit" name="add_accounting_expense" class="btn" style="background:#c0392b;color:#fff;">
+          <i class="fa fa-plus"></i> Ajouter la dépense
+        </button>
+      </form>
+
+      <?php if (empty($accountingPeriodExpenses)): ?>
+        <p style="margin:8px 0 0;color:#64748b;"><i class="fa fa-info-circle"></i> Aucune dépense enregistrée sur cette période.</p>
+      <?php else: ?>
+        <div class="table-responsive">
+          <table class="table table-bordered accounting-responsive-table mgr-expense-list">
+            <thead class="thead-light">
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Libellé</th>
+                <th class="text-center">Montant</th>
+              </tr>
+            </thead>
+            <tbody>
+              <?php foreach ($accountingPeriodExpenses as $expense): ?>
+              <tr>
+                <td data-label="Date"><?= htmlspecialchars($expense['date']) ?></td>
+                <td data-label="Type"><?= htmlspecialchars($expense['type']) ?></td>
+                <td data-label="Libellé"><?= htmlspecialchars($expense['label']) ?></td>
+                <td class="text-center" data-label="Montant" style="font-weight:bold;color:#c0392b;"><?= mikhmon_format_money_amount($expense['amount'], $currency, $cekindo) ?></td>
+              </tr>
+              <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+              <tr class="acct-total-row">
+                <td colspan="3" data-label="Total dépenses"><i class="fa fa-sigma"></i> Total dépenses</td>
+                <td class="text-center" data-label="Montant"><?= mikhmon_format_money_amount($accountingExpensesTotal, $currency, $cekindo) ?></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      <?php endif; ?>
     </div>
 
     <?php if ($accountingNextFrom !== ''): ?>

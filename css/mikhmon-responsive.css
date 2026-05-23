@@ -250,6 +250,20 @@ img {
   white-space: normal;
 }
 
+.manager-portal .mgr-expense-form {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  align-items: end;
+}
+
+.manager-portal .mgr-expense-form .form-control,
+.manager-portal .mgr-expense-list {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 @media screen and (max-width: 749px) {
   .manager-portal .mgr-accounting-help {
     padding: 12px 14px;
@@ -277,6 +291,14 @@ img {
     width: 100%;
     min-width: 0;
     margin-top: 0;
+  }
+
+  .manager-portal .mgr-expense-form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .manager-portal .mgr-expense-form .btn {
+    width: 100%;
   }
 }
 
