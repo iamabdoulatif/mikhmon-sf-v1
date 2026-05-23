@@ -8,6 +8,7 @@ $update = file_exists($root . '/include/app_update.php')
     : '';
 $head = file_get_contents($root . '/include/headhtml.php');
 $manager = file_get_contents($root . '/manager.php');
+$about = file_get_contents($root . '/include/about.php');
 
 if (!file_exists($workflow)) {
     fwrite(STDERR, "DockerHub GitHub Actions workflow is missing\n");
@@ -46,7 +47,7 @@ foreach ($dockerChecks as $label => $needle) {
 $updateChecks = array(
     'update status helper' => 'function mikhmon_update_status',
     'DockerHub tag API' => 'hub.docker.com/v2/repositories',
-    'update banner renderer' => 'function mikhmon_render_update_banner',
+    'update panel renderer' => 'function mikhmon_render_update_panel',
     'RouterOS install guidance' => '/container',
 );
 
@@ -57,14 +58,25 @@ foreach ($updateChecks as $label => $needle) {
     }
 }
 
-if (strpos($head, 'mikhmon_render_update_banner') === false) {
-    fwrite(STDERR, "admin shell must render the app update banner\n");
+if (strpos($head, 'mikhmon_render_update_banner') !== false || strpos($manager, 'mikhmon_render_update_banner') !== false) {
+    fwrite(STDERR, "app update notice must not render globally outside the about section\n");
     exit(1);
 }
 
-if (strpos($manager, 'mikhmon_render_update_banner') === false) {
-    fwrite(STDERR, "manager shell must render the app update banner\n");
-    exit(1);
+$aboutChecks = array(
+    'about update helper include' => 'include_once(__DIR__ . \'/app_update.php\')',
+    'about update panel' => 'mikhmon_render_update_panel',
+    'github update step' => 'GitHub',
+    'dockerhub update step' => 'DockerHub',
+    'mikrotik update step' => 'MikroTik',
+    'routeros command guidance' => '/container',
+);
+
+foreach ($aboutChecks as $label => $needle) {
+    if (strpos($about, $needle) === false) {
+        fwrite(STDERR, $label . " missing from about update section\n");
+        exit(1);
+    }
 }
 
 echo "dockerhub_update_workflow_test passed\n";

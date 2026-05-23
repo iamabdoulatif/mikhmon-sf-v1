@@ -25,7 +25,6 @@ include('./settings/setlang.php');
 include('./include/sellers_config.php');
 include_once('./include/seller_ticket_helper.php');
 include_once('./include/accounting_notifications.php');
-include_once('./include/app_update.php');
 include('./include/managers_config.php');
 include_once('./include/auth.php');
 include_once('./include/csrf.php');
@@ -867,7 +866,6 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
 </head>
 <body class="manager-portal">
 <div class="wrapper">
-<?= mikhmon_render_update_banner(); ?>
 
 <?php if (!$manager_logged_in): ?>
 <!-- ══════════════════════════ PAGE DE CONNEXION ═══════════════════════════ -->

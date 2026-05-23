@@ -118,23 +118,39 @@ if (!function_exists('mikhmon_update_cache_file')) {
     return $status;
   }
 
-  function mikhmon_render_update_banner()
+  function mikhmon_render_update_panel()
   {
     $status = mikhmon_update_status();
-    if (empty($status['available'])) {
-      return '';
-    }
-
     $image = htmlspecialchars($status['image'], ENT_QUOTES, 'UTF-8');
     $current = htmlspecialchars($status['current_version'], ENT_QUOTES, 'UTF-8');
-    $updated = htmlspecialchars($status['latest_updated'], ENT_QUOTES, 'UTF-8');
+    $stamp = htmlspecialchars($status['current_stamp'], ENT_QUOTES, 'UTF-8');
+    $updated = $status['latest_updated'] !== ''
+      ? htmlspecialchars($status['latest_updated'], ENT_QUOTES, 'UTF-8')
+      : 'non disponible';
     $hint = htmlspecialchars($status['install_hint'], ENT_QUOTES, 'UTF-8');
+    $stateClass = !empty($status['available']) ? 'update-available' : 'update-current';
+    $stateIcon = !empty($status['available']) ? 'fa-cloud-download' : 'fa-check-circle';
+    $stateLabel = !empty($status['available']) ? 'Mise a jour disponible' : 'Application a jour';
 
-    return '<div class="mikhmon-update-banner" style="margin:10px 12px 0;padding:12px 14px;border-radius:8px;background:#fff8e1;color:#5f3b00;border-left:4px solid #f39c12;line-height:1.45;">'
-      . '<b><i class="fa fa-cloud-download"></i> Mise a jour disponible</b><br>'
-      . 'Une nouvelle image DockerHub est disponible pour <code>' . $image . ':latest</code>. Version locale: <b>' . $current . '</b>. Derniere publication: <b>' . $updated . '</b>.'
-      . '<details style="margin-top:6px;"><summary style="cursor:pointer;font-weight:bold;">Installer sur MikroTik RouterOS</summary>'
-      . '<code style="display:block;margin-top:6px;white-space:normal;">' . $hint . '</code>'
-      . '</details></div>';
+    return '<div class="mikhmon-update-panel ' . $stateClass . '">'
+      . '<div class="mikhmon-update-status">'
+      . '<span><i class="fa ' . $stateIcon . '"></i> ' . $stateLabel . '</span>'
+      . '<small>Image: <code>' . $image . ':latest</code></small>'
+      . '</div>'
+      . '<div class="mikhmon-update-meta">'
+      . '<div><b>Version locale</b><span>' . $current . '</span></div>'
+      . '<div><b>Build local</b><span>' . $stamp . '</span></div>'
+      . '<div><b>Derniere image DockerHub</b><span>' . $updated . '</span></div>'
+      . '</div>'
+      . '<div class="mikhmon-update-command">'
+      . '<b>Commande MikroTik RouterOS</b>'
+      . '<code>' . $hint . '</code>'
+      . '</div>'
+      . '</div>';
+  }
+
+  function mikhmon_render_update_banner()
+  {
+    return mikhmon_render_update_panel();
   }
 }
