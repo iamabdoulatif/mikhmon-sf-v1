@@ -591,8 +591,8 @@ if ($hotspot == "dashboard" || substr(end(explode("/", $url)), 0, 8) == "?sessio
     var dashboard = setInterval(function() {
       
     $("#r_1").load("./dashboard/aload.php?session=' . $session . '&load=sysresource #r_1"); 
-    $("#r_pppoe").load("./dashboard/aload.php?session=' . $session . '&load=hotspot #r_pppoe");
     $("#r_2").load("./dashboard/aload.php?session=' . $session . '&load=hotspot #r_2"); 
+    $("#r_pppoe").load("./dashboard/aload.php?session=' . $session . '&load=hotspot #r_pppoe");
     $("#r_3").load("./dashboard/aload.php?session=' . $session . '&load=logs #r_3"); 
     
   }, interval1);

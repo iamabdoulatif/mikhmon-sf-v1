@@ -205,6 +205,7 @@ include_once('../include/mikhmon_compat.php');
               </div>
             </div>
             </div>
+          </div>
           <div id="r_pppoe" class="row dashboard-pppoe-row">
             <div class="col-12">
               <div class="card dashboard-pppoe-card">
@@ -248,7 +249,6 @@ include_once('../include/mikhmon_compat.php');
               </div>
             </div>
           </div>
-	          </div>
 
 <?php 
 } else if ($load == "logs") {
