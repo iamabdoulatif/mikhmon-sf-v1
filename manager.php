@@ -1026,7 +1026,7 @@ if (in_array($action, ['overview','accounting'])) {
     <div style="background:#f8f1ff;color:#4a235a;padding:12px 14px;margin-bottom:14px;border-left:4px solid #8e44ad;border-radius:4px;">
       <b><i class="fa fa-info-circle"></i> Rôle du gérant</b><br>
       Le gérant consulte uniquement l’activité utile à la production : connectés en cours, profils disponibles et tickets à générer ou imprimer.
-      Il n’accède ni au tableau de bord technique admin, ni aux revenus globaux.
+      Il n’accède pas au tableau de bord technique admin.
     </div>
 
     <div class="mgr-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
@@ -1038,7 +1038,7 @@ if (in_array($action, ['overview','accounting'])) {
       <div style="flex:1;min-width:170px;background:#fdf2e9;border-radius:8px;padding:14px 16px;border-left:4px solid #d35400;">
         <div style="font-size:11px;color:#d35400;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-ticket"></i> Tickets générés aujourd'hui</div>
         <div style="font-size:24px;font-weight:bold;color:#d35400;"><?= $managerTodayTickets ?> <small style="font-size:13px;">vcr</small></div>
-        <div style="font-size:12px;color:#a04000;">volume uniquement, sans revenu</div>
+        <div style="font-size:12px;color:#a04000;">volume de tickets uniquement</div>
       </div>
       <div style="flex:1;min-width:170px;background:#e8f8f5;border-radius:8px;padding:14px 16px;border-left:4px solid #27ae60;">
         <div style="font-size:11px;color:#27ae60;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-archive"></i> Stock total</div>

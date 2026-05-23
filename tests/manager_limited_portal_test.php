@@ -51,6 +51,7 @@ if ($dashboardStart === false || $dashboardEnd === false || $dashboardEnd <= $da
 $dashboard = substr($manager, $dashboardStart, $dashboardEnd - $dashboardStart);
 $forbiddenDashboardRevenue = array(
     'chiffre d’affaires',
+    'revenu',
     'commission',
     'mikhmon_format_money_amount',
     'managerTodayRevenue',
