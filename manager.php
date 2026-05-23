@@ -538,6 +538,7 @@ $managerAccountingUrl = './manager.php?action=accounting&idbl=' . urlencode($acc
 $accountingNoticeMsg = '';
 $accountingNoticeError = '';
 $accountingNoticeTargets = mikhmon_accounting_notification_targets($accountingSummary, $managerSellersData, $accountingSeller);
+$accountingNoticeTotals = mikhmon_accounting_notice_totals_for_targets($accountingSummary, $accountingNoticeTargets, $currency, $cekindo);
 if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_accounting_notice'])) {
     csrf_guard();
     $sentCount = mikhmon_accounting_publish_notifications(
@@ -551,7 +552,8 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
         $accountingSettlementTime,
         $accountingNextFrom,
         $accountingNextTo,
-        $accountingNextSettlementTime
+        $accountingNextSettlementTime,
+        $accountingNoticeTotals
     );
     if ($sentCount > 0) {
         $accountingNoticeMsg = $sentCount . ' notification(s) envoyée(s) aux vendeurs concernés.';
@@ -1408,7 +1410,13 @@ if (in_array($action, ['overview','accounting'])) {
       } elseif ($accountingSeller !== '' && isset($managerSellersData[$accountingSeller]['name'])) {
         $accountingNoticeSampleName = $managerSellersData[$accountingSeller]['name'];
       }
-      $accountingNoticePreview = mikhmon_accounting_notification_text($accountingNoticeSampleName, $accountingFrom, $accountingTo, $accountingSettlementTime, $accountingNextFrom, $accountingNextTo, $accountingNextSettlementTime);
+      $accountingNoticePreviewTotals = array();
+      if (!empty($accountingNoticeTargets) && isset($accountingNoticeTotals[$accountingNoticeTargets[0]])) {
+        $accountingNoticePreviewTotals = $accountingNoticeTotals[$accountingNoticeTargets[0]];
+      } elseif ($accountingSeller !== '' && isset($accountingNoticeTotals[$accountingSeller])) {
+        $accountingNoticePreviewTotals = $accountingNoticeTotals[$accountingSeller];
+      }
+      $accountingNoticePreview = mikhmon_accounting_notification_text($accountingNoticeSampleName, $accountingFrom, $accountingTo, $accountingSettlementTime, $accountingNextFrom, $accountingNextTo, $accountingNextSettlementTime, $accountingNoticePreviewTotals);
     ?>
     <div class="accounting-notice-box">
       <b><i class="fa fa-bell"></i> Notification aux vendeurs</b>

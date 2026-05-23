@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/mikhmon_compat.php';
+
 if (!function_exists('mikhmon_accounting_notification_file')) {
   function mikhmon_accounting_notification_file()
   {
@@ -33,7 +35,7 @@ if (!function_exists('mikhmon_accounting_notification_file')) {
     return file_put_contents($file, json_encode(array_values($notifications), JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE), LOCK_EX) !== false;
   }
 
-  function mikhmon_accounting_notification_text($sellerName, $fromIso, $toIso, $settlementTime, $nextFromIso = '', $nextToIso = '', $nextSettlementTime = '')
+  function mikhmon_accounting_notification_text($sellerName, $fromIso, $toIso, $settlementTime, $nextFromIso = '', $nextToIso = '', $nextSettlementTime = '', $totals = array())
   {
     $sellerName = trim((string) $sellerName);
     if ($sellerName === '') {
@@ -43,12 +45,58 @@ if (!function_exists('mikhmon_accounting_notification_file')) {
     $settlementTime = mikhmon_accounting_settlement_time($settlementTime);
     $message = 'Bonjour ' . $sellerName . ', le compte de la période du ' . $fromIso . ' au ' . $toIso . ' sera fait à ' . $settlementTime . '.';
 
+    if (is_array($totals) && isset($totals['revenue'])) {
+      $currency = isset($totals['currency']) ? $totals['currency'] : '';
+      $cekindo = isset($totals['cekindo']) && is_array($totals['cekindo']) ? $totals['cekindo'] : array();
+      $revenue = (float) $totals['revenue'];
+      $commission = isset($totals['commission']) ? (float) $totals['commission'] : ($revenue * 10 / 100);
+      $net = isset($totals['net']) ? (float) $totals['net'] : ($revenue - $commission);
+      $message .= ' vente totale: ' . mikhmon_format_money_amount($revenue, $currency, $cekindo)
+        . '. commission de 10% reversee au vendeur: ' . mikhmon_format_money_amount($commission, $currency, $cekindo)
+        . '. somme a verser: ' . mikhmon_format_money_amount($net, $currency, $cekindo) . '.';
+    }
+
     if ($nextFromIso !== '' && $nextToIso !== '') {
       $nextSettlementTime = mikhmon_accounting_settlement_time($nextSettlementTime, $settlementTime);
       $message .= ' Le prochain compte sera du ' . $nextFromIso . ' au ' . $nextToIso . ' à ' . $nextSettlementTime . '.';
     }
 
     return $message;
+  }
+
+  function mikhmon_accounting_notice_totals_for_targets($summary, $targetSellerKeys, $currency = '', $cekindo = array())
+  {
+    $totals = array();
+    if (!isset($summary['days']) || !is_array($summary['days'])) {
+      return $totals;
+    }
+
+    foreach ($targetSellerKeys as $sellerKey) {
+      $sellerKey = (string) $sellerKey;
+      $totals[$sellerKey] = array(
+        'revenue' => 0.0,
+        'commission' => 0.0,
+        'net' => 0.0,
+        'currency' => $currency,
+        'cekindo' => $cekindo,
+      );
+    }
+
+    foreach ($summary['days'] as $day) {
+      if (empty($day['sellers']) || !is_array($day['sellers'])) {
+        continue;
+      }
+      foreach ($day['sellers'] as $sellerKey => $sellerRow) {
+        if (!isset($totals[$sellerKey])) {
+          continue;
+        }
+        $totals[$sellerKey]['revenue'] += isset($sellerRow['revenue']) ? (float) $sellerRow['revenue'] : 0.0;
+        $totals[$sellerKey]['commission'] += isset($sellerRow['commission']) ? (float) $sellerRow['commission'] : 0.0;
+        $totals[$sellerKey]['net'] += isset($sellerRow['net']) ? (float) $sellerRow['net'] : 0.0;
+      }
+    }
+
+    return $totals;
   }
 
   function mikhmon_accounting_notification_targets($summary, $sellersData, $sellerFilter = '')
@@ -75,7 +123,7 @@ if (!function_exists('mikhmon_accounting_notification_file')) {
     return array_keys($targets);
   }
 
-  function mikhmon_accounting_publish_notifications($senderRole, $senderName, $session, $sellersData, $targetSellerKeys, $fromIso, $toIso, $settlementTime, $nextFromIso = '', $nextToIso = '', $nextSettlementTime = '')
+  function mikhmon_accounting_publish_notifications($senderRole, $senderName, $session, $sellersData, $targetSellerKeys, $fromIso, $toIso, $settlementTime, $nextFromIso = '', $nextToIso = '', $nextSettlementTime = '', $sellerTotals = array())
   {
     $notifications = mikhmon_accounting_notifications_load();
     $createdAt = date('Y-m-d H:i:s');
@@ -87,6 +135,7 @@ if (!function_exists('mikhmon_accounting_notification_file')) {
       }
 
       $sellerName = isset($sellersData[$sellerKey]['name']) ? $sellersData[$sellerKey]['name'] : $sellerKey;
+      $totals = isset($sellerTotals[$sellerKey]) && is_array($sellerTotals[$sellerKey]) ? $sellerTotals[$sellerKey] : array();
       $notifications[] = array(
         'id' => sha1($createdAt . '|' . $session . '|' . $sellerKey . '|' . $fromIso . '|' . $toIso . '|' . $settlementTime),
         'type' => 'accounting',
@@ -101,7 +150,10 @@ if (!function_exists('mikhmon_accounting_notification_file')) {
         'next_from' => (string) $nextFromIso,
         'next_to' => (string) $nextToIso,
         'next_settlement_time' => mikhmon_accounting_settlement_time($nextSettlementTime, $settlementTime),
-        'message' => mikhmon_accounting_notification_text($sellerName, $fromIso, $toIso, $settlementTime, $nextFromIso, $nextToIso, $nextSettlementTime),
+        'revenue' => isset($totals['revenue']) ? (float) $totals['revenue'] : 0.0,
+        'commission' => isset($totals['commission']) ? (float) $totals['commission'] : 0.0,
+        'net' => isset($totals['net']) ? (float) $totals['net'] : 0.0,
+        'message' => mikhmon_accounting_notification_text($sellerName, $fromIso, $toIso, $settlementTime, $nextFromIso, $nextToIso, $nextSettlementTime, $totals),
         'created_at' => $createdAt,
       );
       $count++;

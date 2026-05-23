@@ -79,9 +79,22 @@ if (mikhmon_accounting_settlement_time('bad', '18:30:22') !== '18:30:22') {
   exit(1);
 }
 
-$notice = mikhmon_accounting_notification_text('Alpha', '2026-05-01', '2026-05-03', '09:15', '2026-05-04', '2026-05-31', '18:30');
-if (strpos($notice, 'Alpha') === false || strpos($notice, '2026-05-01 au 2026-05-03') === false || strpos($notice, '09:15:00') === false || strpos($notice, '2026-05-04 au 2026-05-31') === false || strpos($notice, '18:30:00') === false) {
-  fwrite(STDERR, 'accounting notification text must include seller, current period/time, and next period/time' . PHP_EOL);
+$notice = mikhmon_accounting_notification_text('Alpha', '2026-05-01', '2026-05-03', '09:15', '2026-05-04', '2026-05-31', '18:30', array(
+  'revenue' => 4500,
+  'commission' => 450,
+  'net' => 4050,
+  'currency' => 'XOF',
+  'cekindo' => array(),
+));
+if (strpos($notice, 'Alpha') === false
+    || strpos($notice, '2026-05-01 au 2026-05-03') === false
+    || strpos($notice, 'vente totale') === false
+    || strpos($notice, 'XOF 4 500') === false
+    || strpos($notice, 'commission de 10%') === false
+    || strpos($notice, 'XOF 450') === false
+    || strpos($notice, 'verser') === false
+    || strpos($notice, 'XOF 4 050') === false) {
+  fwrite(STDERR, 'accounting notification text must include seller totals, 10 percent commission, and net due' . PHP_EOL);
   exit(1);
 }
 
@@ -100,6 +113,11 @@ if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'overview
 }
 if (strpos($managerPage, 'Compte vendeur') === false || strpos($managerPage, 'Heure début') === false || strpos($managerPage, 'Heure fin') === false) {
   fwrite(STDERR, 'manager page must expose seller accounting by date and time range' . PHP_EOL);
+  exit(1);
+}
+if (strpos($managerPage, 'mikhmon_accounting_notice_totals_for_targets($accountingSummary, $accountingNoticeTargets, $currency, $cekindo)') === false
+    || strpos($managerPage, '$accountingNoticeTotals') === false) {
+  fwrite(STDERR, 'manager accounting notifications must pass totals and currency' . PHP_EOL);
   exit(1);
 }
 if (strpos($adminPage, 'ms-section-accounting') === false) {

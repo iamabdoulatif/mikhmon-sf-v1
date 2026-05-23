@@ -555,6 +555,7 @@ $adminAccountingBaseUrl = './admin.php?id=sellers&session=' . urlencode($session
 $adminAccountingNoticeMsg = '';
 $adminAccountingNoticeError = '';
 $adminAccountingNoticeTargets = mikhmon_accounting_notification_targets($adminAccountingSummary, $adminAccountingSellersData, $adminAccountingSeller);
+$adminAccountingNoticeTotals = mikhmon_accounting_notice_totals_for_targets($adminAccountingSummary, $adminAccountingNoticeTargets, $currency, $cekindo);
 if (isset($_POST['admin_send_accounting_notice'])) {
     $sentCount = mikhmon_accounting_publish_notifications(
         'admin',
@@ -567,7 +568,8 @@ if (isset($_POST['admin_send_accounting_notice'])) {
         $adminAccountingSettlementTime,
         $adminAccountingNextFrom,
         $adminAccountingNextTo,
-        $adminAccountingNextSettlementTime
+        $adminAccountingNextSettlementTime,
+        $adminAccountingNoticeTotals
     );
     if ($sentCount > 0) {
         $adminAccountingNoticeMsg = $sentCount . ' notification(s) envoyée(s) aux vendeurs concernés.';
@@ -1648,7 +1650,13 @@ if (isset($_POST['admin_send_accounting_notice'])) {
       } elseif ($adminAccountingSeller !== '' && isset($adminAccountingSellersData[$adminAccountingSeller]['name'])) {
         $adminAccountingNoticeSampleName = $adminAccountingSellersData[$adminAccountingSeller]['name'];
       }
-      $adminAccountingNoticePreview = mikhmon_accounting_notification_text($adminAccountingNoticeSampleName, $adminAccountingFrom, $adminAccountingTo, $adminAccountingSettlementTime, $adminAccountingNextFrom, $adminAccountingNextTo, $adminAccountingNextSettlementTime);
+      $adminAccountingNoticePreviewTotals = array();
+      if (!empty($adminAccountingNoticeTargets) && isset($adminAccountingNoticeTotals[$adminAccountingNoticeTargets[0]])) {
+        $adminAccountingNoticePreviewTotals = $adminAccountingNoticeTotals[$adminAccountingNoticeTargets[0]];
+      } elseif ($adminAccountingSeller !== '' && isset($adminAccountingNoticeTotals[$adminAccountingSeller])) {
+        $adminAccountingNoticePreviewTotals = $adminAccountingNoticeTotals[$adminAccountingSeller];
+      }
+      $adminAccountingNoticePreview = mikhmon_accounting_notification_text($adminAccountingNoticeSampleName, $adminAccountingFrom, $adminAccountingTo, $adminAccountingSettlementTime, $adminAccountingNextFrom, $adminAccountingNextTo, $adminAccountingNextSettlementTime, $adminAccountingNoticePreviewTotals);
     ?>
     <div class="accounting-notice-box">
       <b><i class="fa fa-bell"></i> Notification aux vendeurs</b>
