@@ -26,8 +26,8 @@ if ($period['total']['revenue'] !== 4500.0) {
   exit(1);
 }
 
-if ($period['total']['commission'] !== 650.0) {
-  fwrite(STDERR, 'period commission expected 650 got ' . $period['total']['commission'] . PHP_EOL);
+if ($period['total']['commission'] !== 450.0) {
+  fwrite(STDERR, 'period commission expected 450 got ' . $period['total']['commission'] . PHP_EOL);
   exit(1);
 }
 
@@ -41,13 +41,13 @@ if ($period['days']['may/01/2026']['sellers']['alpha']['revenue'] !== 1000.0) {
   exit(1);
 }
 
-if ($period['days']['may/01/2026']['sellers']['beta']['commission'] !== 400.0) {
-  fwrite(STDERR, 'may/01 beta commission expected 400' . PHP_EOL);
+if ($period['days']['may/01/2026']['sellers']['beta']['commission'] !== 200.0 || $period['days']['may/01/2026']['sellers']['beta']['commission_rate'] !== 10) {
+  fwrite(STDERR, 'may/01 beta commission must be fixed at 10 percent' . PHP_EOL);
   exit(1);
 }
 
-$alphaOnly = mikhmon_accounting_period_summary($sales, $sellers, '2026-05-01', '2026-05-03', 'alpha');
-if ($alphaOnly['total']['count'] !== 2 || isset($alphaOnly['days']['may/01/2026']['sellers']['beta'])) {
+$alphaOnly = mikhmon_accounting_period_summary($sales, $sellers, '2026-05-01', '2026-05-03', 'alpha', '08:30', '08:30');
+if ($alphaOnly['total']['count'] !== 1 || $alphaOnly['total']['revenue'] !== 1500.0 || isset($alphaOnly['days']['may/01/2026']['sellers']['alpha'])) {
   fwrite(STDERR, 'seller filter must keep only the selected vendor' . PHP_EOL);
   exit(1);
 }
@@ -94,16 +94,20 @@ if ($targets !== array('alpha', 'beta')) {
 
 $managerPage = file_get_contents(__DIR__ . '/../manager.php');
 $adminPage = file_get_contents(__DIR__ . '/../settings/manage_sellers.php');
-if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout')") === false) {
-  fwrite(STDERR, 'manager page must restrict accounting to admin-facing tools only' . PHP_EOL);
+if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'logout')") === false) {
+  fwrite(STDERR, 'manager page must allow manager seller accounting without admin dashboard access' . PHP_EOL);
+  exit(1);
+}
+if (strpos($managerPage, 'Compte vendeur') === false || strpos($managerPage, 'Heure début') === false || strpos($managerPage, 'Heure fin') === false) {
+  fwrite(STDERR, 'manager page must expose seller accounting by date and time range' . PHP_EOL);
   exit(1);
 }
 if (strpos($adminPage, 'ms-section-accounting') === false) {
   fwrite(STDERR, 'admin sellers page must expose the accounting section' . PHP_EOL);
   exit(1);
 }
-if (strpos($adminPage, 'Heure du compte') === false || strpos($adminPage, 'acct_settled_at') === false) {
-  fwrite(STDERR, 'admin sellers page must expose the accounting settlement time' . PHP_EOL);
+if (strpos($adminPage, 'Heure début') === false || strpos($adminPage, 'Heure fin') === false || strpos($adminPage, 'acct_settled_at') === false || strpos($adminPage, 'acct_next_settled_at') === false) {
+  fwrite(STDERR, 'admin sellers page must expose start and end accounting times' . PHP_EOL);
   exit(1);
 }
 if (strpos($adminPage, 'admin_send_accounting_notice') === false) {

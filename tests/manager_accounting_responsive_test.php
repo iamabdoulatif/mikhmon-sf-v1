@@ -9,9 +9,24 @@ if ($manager === false || $responsive === false) {
     exit(1);
 }
 
-if (strpos($manager, "\$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout')") === false) {
-    fwrite(STDERR, "manager accounting route must be hidden from the manager portal\n");
+if (strpos($manager, "\$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'logout')") === false) {
+    fwrite(STDERR, "manager accounting route must be available to the manager portal\n");
     exit(1);
+}
+
+$managerChecks = array(
+    'accounting shell class' => 'mgr-accounting-shell',
+    'accounting form class' => 'mgr-accounting-form',
+    'start time label' => 'Heure début',
+    'end time label' => 'Heure fin',
+    'seller accounting label' => 'Compte vendeur',
+);
+
+foreach ($managerChecks as $label => $needle) {
+    if (strpos($manager, $needle) === false) {
+        fwrite(STDERR, $label . " missing from manager.php\n");
+        exit(1);
+    }
 }
 
 $cssChecks = array(

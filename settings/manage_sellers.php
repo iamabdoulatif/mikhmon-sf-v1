@@ -537,7 +537,9 @@ $adminAccountingSummary = mikhmon_accounting_period_summary(
     $adminAccountingSellersData,
     $adminAccountingFrom,
     $adminAccountingTo,
-    $adminAccountingSeller
+    $adminAccountingSeller,
+    $adminAccountingSettlementTime,
+    $adminAccountingNextSettlementTime
 );
 $adminAccountingNextFrom = '';
 $adminAccountingNextTo = $adminAccountingBounds['to'];
@@ -1559,11 +1561,11 @@ if (isset($_POST['admin_send_accounting_notice'])) {
           </select>
         </div>
         <div class="portal-filter-item">
-          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure du compte</label>
+          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure début</label>
           <input type="time" name="acct_settled_at" class="form-control" step="60" value="<?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?>">
         </div>
         <div class="portal-filter-item">
-          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure du prochain compte</label>
+          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure fin</label>
           <input type="time" name="acct_next_settled_at" class="form-control" step="60" value="<?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?>">
         </div>
       </div>
@@ -1603,7 +1605,7 @@ if (isset($_POST['admin_send_accounting_notice'])) {
     <div class="admin-accounting-cards">
       <div class="admin-accounting-card" style="background:#eaf4fb;border-left:4px solid #2980b9;">
         <div class="admin-accounting-card-label" style="color:#2980b9;"><i class="fa fa-calendar"></i> Période arrêtée</div>
-        <div class="admin-accounting-card-value" style="font-size:18px;color:#2980b9;"><?= htmlspecialchars($adminAccountingFrom) ?> &rarr; <?= htmlspecialchars($adminAccountingTo) ?></div>
+        <div class="admin-accounting-card-value" style="font-size:18px;color:#2980b9;"><?= htmlspecialchars($adminAccountingFrom) ?> <?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?> &rarr; <?= htmlspecialchars($adminAccountingTo) ?> <?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?></div>
         <div style="font-size:12px;color:#1a6fa0;"><?= htmlspecialchars($adminAcctSellerLabel) ?></div>
       </div>
       <div class="admin-accounting-card" style="background:#f3e8fd;border-left:4px solid #8e44ad;">
@@ -1615,7 +1617,7 @@ if (isset($_POST['admin_send_accounting_notice'])) {
         <div class="admin-accounting-card-value" style="color:#27ae60;"><?= mikhmon_format_money_amount($adminAcctTotal['revenue'], $currency, $cekindo) ?></div>
       </div>
       <div class="admin-accounting-card" style="background:#fff8e1;border-left:4px solid #e67e22;">
-        <div class="admin-accounting-card-label" style="color:#e67e22;"><i class="fa fa-percent"></i> Commissions</div>
+        <div class="admin-accounting-card-label" style="color:#e67e22;"><i class="fa fa-percent"></i> Commission vendeur (10%)</div>
         <div class="admin-accounting-card-value" style="color:#e67e22;"><?= mikhmon_format_money_amount($adminAcctTotal['commission'], $currency, $cekindo) ?></div>
       </div>
       <div class="admin-accounting-card" style="background:#fdeef7;border-left:4px solid #c0398f;">
@@ -1623,8 +1625,8 @@ if (isset($_POST['admin_send_accounting_notice'])) {
         <div class="admin-accounting-card-value" style="color:#c0398f;"><?= mikhmon_format_money_amount($adminAcctTotal['net'], $currency, $cekindo) ?></div>
       </div>
       <div class="admin-accounting-card" style="background:#eef2f7;border-left:4px solid #34495e;">
-        <div class="admin-accounting-card-label" style="color:#34495e;"><i class="fa fa-clock-o"></i> Heure du compte</div>
-        <div class="admin-accounting-card-value" style="color:#34495e;"><?= htmlspecialchars($adminAccountingSettlementTime) ?></div>
+        <div class="admin-accounting-card-label" style="color:#34495e;"><i class="fa fa-clock-o"></i> Plage horaire</div>
+        <div class="admin-accounting-card-value" style="color:#34495e;"><?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?> &rarr; <?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?></div>
       </div>
     </div>
 

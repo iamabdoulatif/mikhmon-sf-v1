@@ -306,6 +306,22 @@ if (!function_exists('mikhmon_month_map')) {
     return date('H:i:s');
   }
 
+  function mikhmon_accounting_commission_rate($sellerData = array())
+  {
+    return 10;
+  }
+
+  function mikhmon_accounting_sale_datetime($sale)
+  {
+    $saleIso = mikhmon_accounting_iso_date(isset($sale['date']) ? $sale['date'] : '');
+    if ($saleIso === '') {
+      return '';
+    }
+
+    $saleTime = mikhmon_accounting_settlement_time(isset($sale['time']) ? $sale['time'] : '00:00:00', '00:00:00');
+    return $saleIso . ' ' . $saleTime;
+  }
+
   function mikhmon_accounting_day_keys_between($fromIso, $toIso)
   {
     $fromIso = mikhmon_accounting_iso_date($fromIso);
@@ -372,10 +388,12 @@ if (!function_exists('mikhmon_month_map')) {
     $bucket['net'] += ($amount - $commission);
   }
 
-  function mikhmon_accounting_period_summary($sales, $sellersData, $fromIso, $toIso, $sellerFilter = '')
+  function mikhmon_accounting_period_summary($sales, $sellersData, $fromIso, $toIso, $sellerFilter = '', $fromTime = '00:00:00', $toTime = '23:59:59')
   {
     $fromIso = mikhmon_accounting_iso_date($fromIso);
     $toIso = mikhmon_accounting_iso_date($toIso, $fromIso);
+    $fromTime = mikhmon_accounting_settlement_time($fromTime, '00:00:00');
+    $toTime = mikhmon_accounting_settlement_time($toTime, '23:59:59');
     if ($fromIso === '' || $toIso === '') {
       return array('from' => '', 'to' => '', 'days' => array(), 'total' => mikhmon_accounting_blank_total());
     }
@@ -384,11 +402,20 @@ if (!function_exists('mikhmon_month_map')) {
       $fromIso = $toIso;
       $toIso = $tmp;
     }
+    $fromDateTime = $fromIso . ' ' . $fromTime;
+    $toDateTime = $toIso . ' ' . $toTime;
+    if ($fromDateTime > $toDateTime) {
+      $tmpDateTime = $fromDateTime;
+      $fromDateTime = $toDateTime;
+      $toDateTime = $tmpDateTime;
+    }
 
     $sellerFilter = preg_replace('/[^a-zA-Z0-9_]/', '', (string) $sellerFilter);
     $summary = array(
       'from' => $fromIso,
       'to' => $toIso,
+      'from_time' => $fromTime,
+      'to_time' => $toTime,
       'days' => array(),
       'total' => mikhmon_accounting_blank_total(),
     );
@@ -408,6 +435,10 @@ if (!function_exists('mikhmon_month_map')) {
       if ($saleIso === '' || $saleIso < $fromIso || $saleIso > $toIso) {
         continue;
       }
+      $saleDateTime = mikhmon_accounting_sale_datetime($sale);
+      if ($saleDateTime === '' || $saleDateTime < $fromDateTime || $saleDateTime > $toDateTime) {
+        continue;
+      }
 
       $sellerKey = mikhmon_accounting_seller_key(isset($sale['comment']) ? $sale['comment'] : '', $sellersData);
       if ($sellerKey === '' || !isset($sellersData[$sellerKey])) {
@@ -423,7 +454,7 @@ if (!function_exists('mikhmon_month_map')) {
       }
 
       $amount = mikhmon_parse_money_amount(isset($sale['price']) ? $sale['price'] : 0);
-      $rate = isset($sellersData[$sellerKey]['commission']) ? (int) $sellersData[$sellerKey]['commission'] : 0;
+      $rate = mikhmon_accounting_commission_rate($sellersData[$sellerKey]);
       $commission = $amount * $rate / 100;
       $sellerName = isset($sellersData[$sellerKey]['name']) ? $sellersData[$sellerKey]['name'] : $sellerKey;
 

@@ -12,7 +12,7 @@ $url    = $_SERVER['REQUEST_URI'];
 $action = isset($_GET['action']) ? $_GET['action'] : 'dashboard';
 $idbl   = isset($_GET['idbl'])   ? $_GET['idbl']   : '';
 $idhr   = isset($_GET['idhr'])   ? $_GET['idhr']   : '';
-$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout');
+$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'logout');
 
 include_once('./lib/routeros_api.class.php');
 include_once('./lib/formatbytesbites.php');
@@ -521,7 +521,7 @@ if ($accountingSeller !== '' && !isset($managerSellersData[$accountingSeller])) 
 }
 $accountingSettlementTime = mikhmon_accounting_settlement_time(isset($_GET['settled_at']) ? $_GET['settled_at'] : (isset($_POST['settled_at']) ? $_POST['settled_at'] : ''), date('H:i:s'));
 $accountingNextSettlementTime = mikhmon_accounting_settlement_time(isset($_GET['next_settled_at']) ? $_GET['next_settled_at'] : (isset($_POST['next_settled_at']) ? $_POST['next_settled_at'] : ''), $accountingSettlementTime);
-$accountingSummary = mikhmon_accounting_period_summary($getData, $managerSellersData, $accountingFrom, $accountingTo, $accountingSeller);
+$accountingSummary = mikhmon_accounting_period_summary($getData, $managerSellersData, $accountingFrom, $accountingTo, $accountingSeller, $accountingSettlementTime, $accountingNextSettlementTime);
 $accountingNextFrom = '';
 $accountingNextTo = $accountingBounds['to'];
 if ($accountingTo !== '') {
@@ -959,6 +959,11 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
     <i class="fa fa-bar-chart"></i> Ventes vendeurs
   </a>
 
+  <a href="<?= $managerAccountingUrl ?>"
+     class="menu<?= ($action==='accounting') ? ' active' : '' ?>">
+    <i class="fa fa-calculator"></i> Compte vendeur
+  </a>
+
   <a href="./manager.php?action=tickets"
      class="menu<?= ($action==='tickets') ? ' active' : '' ?>">
     <i class="fa fa-ticket"></i> Générer &amp; imprimer
@@ -1060,6 +1065,9 @@ if (in_array($action, ['overview','accounting'])) {
     <div class="mgr-action-grid">
       <a href="<?= $managerOverviewUrl ?>" class="mgr-action-card" style="background:#4aa3d6;">
         <i class="fa fa-line-chart"></i> Ventes des vendeurs
+      </a>
+      <a href="<?= $managerAccountingUrl ?>" class="mgr-action-card" style="background:#8e44ad;">
+        <i class="fa fa-calculator"></i> Compte vendeur
       </a>
       <a href="./manager.php?action=tickets" class="mgr-action-card" style="background:#163c63;">
         <i class="fa fa-ticket"></i> Générer &amp; imprimer
@@ -1275,7 +1283,7 @@ if (in_array($action, ['overview','accounting'])) {
 <div class="card">
   <div class="card-header">
     <h3><i class="fa fa-calculator"></i>
-      <?= isset($_manager_accounting) ? $_manager_accounting : 'Accounting' ?>
+      Compte vendeur
       <?php
         if (strlen($idbl) > 0) {
             $m1 = substr($idbl,0,3); $y1 = substr($idbl,3,4);
@@ -1302,8 +1310,8 @@ if (in_array($action, ['overview','accounting'])) {
     </div>
 
     <div class="portal-note-card mgr-accounting-help" style="margin-bottom:16px;text-align:left;">
-      <b><i class="fa fa-scissors"></i> Comptabilité par arrêt de période</b><br>
-      Choisissez une période, puis chaque journée est séparée avec son total par vendeur. Après avoir fait les comptes jusqu'à une date, utilisez le lien suivant pour repartir du lendemain sans mélanger les périodes déjà réglées.
+      <b><i class="fa fa-scissors"></i> Compte vendeur par période exacte</b><br>
+      Choisissez le vendeur, une date X avec heure de début, puis une date Y avec heure de fin. Le gérant encaisse la vente totale et octroie automatiquement 10% de commission au vendeur.
     </div>
 
     <form method="get" action="./manager.php" class="portal-card-section mgr-accounting-shell" style="margin-bottom:18px;">
@@ -1319,9 +1327,9 @@ if (in_array($action, ['overview','accounting'])) {
           <input type="date" name="to" class="form-control" value="<?= htmlspecialchars($accountingTo) ?>">
         </div>
         <div class="portal-filter-item">
-          <label class="transfer-label"><i class="fa fa-user"></i> Vendeur</label>
-          <select name="seller" class="form-control">
-            <option value="">Tous les vendeurs</option>
+          <label class="transfer-label"><i class="fa fa-user"></i> Vendeur à compter</label>
+          <select name="seller" class="form-control" required>
+            <option value="">Choisir un vendeur</option>
             <?php foreach ($managerSellersData as $sk => $sd): ?>
               <option value="<?= htmlspecialchars($sk) ?>" <?= $accountingSeller === $sk ? 'selected' : '' ?>>
                 <?= htmlspecialchars($sd['name']) ?>
@@ -1330,11 +1338,11 @@ if (in_array($action, ['overview','accounting'])) {
           </select>
         </div>
         <div class="portal-filter-item">
-          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure du compte</label>
+          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure début</label>
           <input type="time" name="settled_at" class="form-control" step="60" value="<?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?>">
         </div>
         <div class="portal-filter-item">
-          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure du prochain compte</label>
+          <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure fin</label>
           <input type="time" name="next_settled_at" class="form-control" step="60" value="<?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?>">
         </div>
       </div>
@@ -1357,7 +1365,7 @@ if (in_array($action, ['overview','accounting'])) {
     <div class="mgr-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
       <div style="flex:1;min-width:170px;background:#eaf4fb;border-radius:8px;padding:14px 16px;border-left:4px solid #2980b9;">
         <div style="font-size:11px;color:#2980b9;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-calendar"></i> Période arrêtée</div>
-        <div style="font-size:18px;font-weight:bold;color:#2980b9;"><?= htmlspecialchars($accountingFrom) ?> → <?= htmlspecialchars($accountingTo) ?></div>
+        <div style="font-size:18px;font-weight:bold;color:#2980b9;"><?= htmlspecialchars($accountingFrom) ?> <?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?> → <?= htmlspecialchars($accountingTo) ?> <?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?></div>
         <div style="font-size:12px;color:#1a6fa0;"><?= htmlspecialchars($acctSellerLabel) ?></div>
       </div>
       <div style="flex:1;min-width:150px;background:#f3e8fd;border-radius:8px;padding:14px 16px;border-left:4px solid #8e44ad;">
@@ -1369,7 +1377,7 @@ if (in_array($action, ['overview','accounting'])) {
         <div style="font-size:22px;font-weight:bold;color:#27ae60;"><?= mikhmon_format_money_amount($acctTotal['revenue'], $currency, $cekindo) ?></div>
       </div>
       <div style="flex:1;min-width:150px;background:#fff8e1;border-radius:8px;padding:14px 16px;border-left:4px solid #e67e22;">
-        <div style="font-size:11px;color:#e67e22;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-percent"></i> Commissions</div>
+        <div style="font-size:11px;color:#e67e22;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-percent"></i> Commission vendeur (10%)</div>
         <div style="font-size:22px;font-weight:bold;color:#e67e22;"><?= mikhmon_format_money_amount($acctTotal['commission'], $currency, $cekindo) ?></div>
       </div>
       <div style="flex:1;min-width:150px;background:#fdeef7;border-radius:8px;padding:14px 16px;border-left:4px solid #c0398f;">
@@ -1377,8 +1385,8 @@ if (in_array($action, ['overview','accounting'])) {
         <div style="font-size:22px;font-weight:bold;color:#c0398f;"><?= mikhmon_format_money_amount($acctTotal['net'], $currency, $cekindo) ?></div>
       </div>
       <div style="flex:1;min-width:150px;background:#eef2f7;border-radius:8px;padding:14px 16px;border-left:4px solid #34495e;">
-        <div style="font-size:11px;color:#34495e;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-clock-o"></i> Heure du compte</div>
-        <div style="font-size:22px;font-weight:bold;color:#34495e;"><?= htmlspecialchars($accountingSettlementTime) ?></div>
+        <div style="font-size:11px;color:#34495e;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-clock-o"></i> Plage horaire</div>
+        <div style="font-size:22px;font-weight:bold;color:#34495e;"><?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?> → <?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?></div>
       </div>
     </div>
 
