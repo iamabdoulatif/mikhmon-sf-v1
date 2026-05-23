@@ -15,6 +15,8 @@ $required = array(
     'active hotspot api call' => '/ip/hotspot/active/print',
     'connected users card' => 'Connectés maintenant',
     'ticket workspace card' => 'Générer &amp; imprimer',
+    'vendor sales overview' => 'Ventes des vendeurs',
+    'overview route allowed' => "\$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout')",
     'manager dashboard redirect for denied routes' => 'manager.php?action=dashboard',
 );
 
@@ -27,7 +29,6 @@ foreach ($required as $label => $needle) {
 
 $forbiddenManagerNav = array(
     'manager accounting nav' => 'href="<?= $managerAccountingUrl ?>"',
-    'manager overview nav' => 'href="<?= $managerOverviewUrl ?>"',
     'manager transfer nav' => 'href="./manager.php?action=transfer"',
     'manager vendors nav' => 'href="./manager.php?action=vendors"',
     'manager logs nav' => 'href="./manager.php?action=logs"',

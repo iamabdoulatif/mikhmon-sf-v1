@@ -12,7 +12,7 @@ $url    = $_SERVER['REQUEST_URI'];
 $action = isset($_GET['action']) ? $_GET['action'] : 'dashboard';
 $idbl   = isset($_GET['idbl'])   ? $_GET['idbl']   : '';
 $idhr   = isset($_GET['idhr'])   ? $_GET['idhr']   : '';
-$managerAllowedActions = array('dashboard', 'tickets', 'logout');
+$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout');
 
 include_once('./lib/routeros_api.class.php');
 include_once('./lib/formatbytesbites.php');
@@ -533,7 +533,7 @@ if ($accountingTo !== '') {
     }
 }
 $managerHomeUrl = './manager.php?action=dashboard';
-$managerOverviewUrl = './manager.php?action=dashboard';
+$managerOverviewUrl = './manager.php?action=overview&idbl=' . strtolower(date("M")) . date("Y");
 $managerAccountingUrl = './manager.php?action=dashboard';
 $accountingNoticeMsg = '';
 $accountingNoticeError = '';
@@ -954,6 +954,11 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
     <i class="fa fa-home"></i> Accueil gérant
   </a>
 
+  <a href="<?= $managerOverviewUrl ?>"
+     class="menu<?= ($action==='overview') ? ' active' : '' ?>">
+    <i class="fa fa-bar-chart"></i> Ventes vendeurs
+  </a>
+
   <a href="./manager.php?action=tickets"
      class="menu<?= ($action==='tickets') ? ' active' : '' ?>">
     <i class="fa fa-ticket"></i> Générer &amp; imprimer
@@ -1053,6 +1058,9 @@ if (in_array($action, ['overview','accounting'])) {
     </div>
 
     <div class="mgr-action-grid">
+      <a href="<?= $managerOverviewUrl ?>" class="mgr-action-card" style="background:#4aa3d6;">
+        <i class="fa fa-line-chart"></i> Ventes des vendeurs
+      </a>
       <a href="./manager.php?action=tickets" class="mgr-action-card" style="background:#163c63;">
         <i class="fa fa-ticket"></i> Générer &amp; imprimer
       </a>

@@ -9,7 +9,7 @@ if ($manager === false || $responsive === false) {
     exit(1);
 }
 
-if (strpos($manager, "\$managerAllowedActions = array('dashboard', 'tickets', 'logout')") === false) {
+if (strpos($manager, "\$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout')") === false) {
     fwrite(STDERR, "manager accounting route must be hidden from the manager portal\n");
     exit(1);
 }

@@ -94,7 +94,7 @@ if ($targets !== array('alpha', 'beta')) {
 
 $managerPage = file_get_contents(__DIR__ . '/../manager.php');
 $adminPage = file_get_contents(__DIR__ . '/../settings/manage_sellers.php');
-if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'tickets', 'logout')") === false) {
+if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'overview', 'tickets', 'logout')") === false) {
   fwrite(STDERR, 'manager page must restrict accounting to admin-facing tools only' . PHP_EOL);
   exit(1);
 }
