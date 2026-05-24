@@ -12,6 +12,7 @@ permissions:
 env:
   IMAGE_NAME: latif225/mikhmonv3-safelinkhub
   DOCKERFILE: Dockerfile.mikrotik
+  DELETE_DOCKERHUB_EXISTING_TAGS: "1"
 
 jobs:
   flattened-routeros-images:

@@ -25,6 +25,7 @@ $checks = array(
     'skopeo install step' => 'sudo apt-get install -y skopeo',
     'qemu setup step' => 'docker/setup-qemu-action@v3',
     'multi-arch manifest tags' => 'MANIFEST_TAGS: latest v1',
+    'dockerhub tag cleanup default' => 'DELETE_DOCKERHUB_EXISTING_TAGS: "1"',
 );
 
 foreach ($checks as $label => $needle) {

@@ -7,6 +7,7 @@ BUILD_STAMP="${BUILD_STAMP:-$(date -u +%Y%m%d%H%M%S)}"
 BUILD_VERSION="${BUILD_VERSION:-v3.0.${BUILD_STAMP}}"
 MANIFEST_TAGS="${MANIFEST_TAGS:-latest v1}"
 PUSH_IMAGES="${PUSH_IMAGES:-1}"
+DELETE_DOCKERHUB_EXISTING_TAGS="${DELETE_DOCKERHUB_EXISTING_TAGS:-1}"
 MIN_COMPRESSED_MB="${MIN_COMPRESSED_MB:-11}"
 MAX_COMPRESSED_MB="${MAX_COMPRESSED_MB:-13}"
 SIZE_CHECK_PLATFORMS="${SIZE_CHECK_PLATFORMS:-linux/arm64 linux/arm/v6 linux/arm/v7}"
@@ -33,6 +34,74 @@ fi
 
 docker_login() {
   printf '%s' "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+}
+
+delete_enabled() {
+  case "$DELETE_DOCKERHUB_EXISTING_TAGS" in
+    1|true|TRUE|yes|YES) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+delete_existing_dockerhub_tags() {
+  if ! push_enabled || ! delete_enabled; then
+    return 0
+  fi
+
+  python3 <<'PY'
+import json
+import os
+import sys
+import urllib.error
+import urllib.request
+
+image_name = os.environ["IMAGE_NAME"]
+username = os.environ["DOCKERHUB_USERNAME"]
+password = os.environ["DOCKERHUB_TOKEN"]
+
+if "/" not in image_name or image_name.count("/") != 1:
+    print(f"Skipping DockerHub cleanup for non-DockerHub image name: {image_name}")
+    sys.exit(0)
+
+namespace, repository = image_name.split("/", 1)
+login_payload = json.dumps({"username": username, "password": password}).encode("utf-8")
+login_request = urllib.request.Request(
+    "https://hub.docker.com/v2/users/login/",
+    data=login_payload,
+    headers={"Content-Type": "application/json"},
+    method="POST",
+)
+
+with urllib.request.urlopen(login_request, timeout=30) as response:
+    token = json.load(response)["token"]
+
+headers = {"Authorization": f"JWT {token}"}
+tags = []
+next_url = f"https://hub.docker.com/v2/repositories/{namespace}/{repository}/tags?page_size=100"
+
+while next_url:
+    request = urllib.request.Request(next_url, headers=headers)
+    with urllib.request.urlopen(request, timeout=30) as response:
+        payload = json.load(response)
+    tags.extend(tag["name"] for tag in payload.get("results", []) if tag.get("name"))
+    next_url = payload.get("next")
+
+if not tags:
+    print(f"No existing DockerHub tags to delete for {namespace}/{repository}.")
+    sys.exit(0)
+
+for tag in tags:
+    delete_url = f"https://hub.docker.com/v2/repositories/{namespace}/{repository}/tags/{tag}/"
+    request = urllib.request.Request(delete_url, headers=headers, method="DELETE")
+    try:
+        urllib.request.urlopen(request, timeout=30).close()
+        print(f"Deleted old DockerHub tag: {tag}")
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            print(f"DockerHub tag already absent: {tag}")
+            continue
+        raise
+PY
 }
 
 set_platform_override_args() {
@@ -199,6 +268,7 @@ publish_manifest_tags() {
 
 if push_enabled; then
   docker_login
+  delete_existing_dockerhub_tags
 fi
 
 PUBLISHED_TAGS=()
