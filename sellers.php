@@ -477,7 +477,7 @@ if ($seller_logged_in && $action === 'generate') {
 .btn-transfer {
     display: inline-block;
     padding: 10px 28px;
-    background: #2980b9;
+    background: #20a8d8;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -488,7 +488,7 @@ if ($seller_logged_in && $action === 'generate') {
     width: 100%;
     max-width: 220px;
 }
-.btn-transfer:hover { background: #1a6fa0; }
+.btn-transfer:hover { background: #1a8bae; }
 .seller-total-row {
     background: #eef6fb;
 }
@@ -717,40 +717,42 @@ if ($seller_logged_in && $action === 'generate') {
     <link rel="stylesheet" href="css/mikhmon-portal.css">
     <link rel="stylesheet" href="css/mikhmon-responsive.css">
 </head>
-<body class="seller-portal">
+<body class="<?= $seller_logged_in ? 'seller-portal' : 'auth-screen' ?>">
 <div class="wrapper">
 
 <?php if (!$seller_logged_in): ?>
 <!-- ═══════════════════════════════════════════════════════════════════════════
      PAGE DE CONNEXION VENDEUR
      ═══════════════════════════════════════════════════════════════════════ -->
-<div class="seller-login-wrap" style="max-width:400px;margin:72px auto 48px;padding:0 16px 48px;min-height:calc(100vh - 120px);">
-  <div class="seller-login-card card portal-auth-card portal-auth-card-sm" style="width:100%;max-width:400px;margin:0 auto;">
-    <div class="card-header">
-      <h3><i class="fa fa-ticket"></i> <?= $_seller_login_title ?></h3>
+<div class="portal-auth-wrap" style="max-width:400px;margin:0 auto;padding:5% 0 32px;min-height:auto;">
+  <div class="login-card card portal-auth-card portal-auth-card-sm" style="width:100%;max-width:400px;margin:0 auto;">
+    <div class="card-header text-center">
+      <h3><?= isset($_please_login) ? $_please_login : 'Veuillez vous connecter' ?></h3>
     </div>
-    <div class="card-body portal-auth-body">
-      <div class="portal-auth-logo">
-        <img src="img/favicon.png" alt="MIKHMON Logo"><br>
-        <span class="portal-auth-logo-title">MIKHMON <small class="login-logo-subtitle">BY SafeLink Africa</small></span>
+    <div class="card-body login-card-body">
+      <div class="login-logo">
+        <img src="img/favicon.png" alt="MIKHMON Logo">
+        <span>MIKHMON <small class="login-logo-subtitle">BY SafeLink Africa</small></span>
         <div class="login-logo-contact">+2250709100552</div>
       </div>
-      <form autocomplete="off" action="" method="post" class="portal-auth-form">
+      <div class="text-center login-role-row">
+        <span class="role-badge badge-vendor">
+          <i class="fa fa-ticket"></i> <?= isset($_seller) ? $_seller : 'Vendeur' ?>
+        </span>
+      </div>
+      <form autocomplete="off" action="" method="post">
         <?= csrf_field() ?>
-        <div class="portal-auth-field">
-          <input class="form-control portal-auth-input"
-                 type="text" name="seller_user" placeholder="<?= $_seller_id ?>" required autofocus>
-        </div>
-        <div class="portal-auth-field">
-          <input class="form-control portal-auth-input"
-                 type="password" name="seller_pass" placeholder="<?= $_password ?>" required>
-        </div>
-        <div class="portal-auth-field">
-          <input class="btn-login bg-primary pointer portal-auth-submit"
-                 type="submit" name="seller_login" value="<?= $_seller_login_title ?>">
-        </div>
-        <div class="text-center"><?= $login_error ?></div>
+        <input class="login-field form-control" type="text" name="seller_user"
+               placeholder="<?= isset($_seller_id) ? $_seller_id : 'Identifiant' ?>" required autofocus>
+        <input class="login-field form-control" type="password" name="seller_pass"
+               placeholder="<?= isset($_password) ? $_password : 'Mot de passe' ?>" required>
+        <input class="login-submit btn-vendor" type="submit" name="seller_login"
+               value="<?= isset($_seller_login_title) ? $_seller_login_title : 'Connexion vendeur' ?>">
+        <?= $login_error ?>
       </form>
+      <div class="portal-auth-footer-link">
+        <a href="./admin.php?id=login">← <?= isset($_please_login) ? $_please_login : 'Connexion' ?></a>
+      </div>
     </div>
     <div class="card-footer login-footer">
       <img src="img/safelink-africa.png" alt="SafeLink Africa">
@@ -946,72 +948,78 @@ if ($accept_error): echo '<div class="alert-danger"><i class="fa fa-ban"></i> ' 
 </div>
 <?php endif; ?>
 
-<div class="card">
-  <div class="card-header">
-    <h3><i class="fa fa-eye"></i> <?= isset($_stock_vendors) ? $_stock_vendors : 'Vendor Stock' ?></h3>
-  </div>
+<?php if (empty($allSellersStock)): ?>
+<div class="card seller-dash-card">
   <div class="card-body">
-    <?php if (empty($allSellersStock)): ?>
-      <p class="stock-empty-note">
-        <i class="fa fa-info-circle"></i>
-        <?= isset($_stock_no_seller) ? $_stock_no_seller : 'No other vendor registered on this session' ?> (<?= htmlspecialchars($seller_session_name) ?>).
-      </p>
+    <p class="stock-empty-note">
+      <i class="fa fa-info-circle"></i>
+      <?= isset($_stock_no_seller) ? $_stock_no_seller : 'No other vendor registered on this session' ?> (<?= htmlspecialchars($seller_session_name) ?>).
+    </p>
+  </div>
+</div>
+<?php else: ?>
+
+<?php if (count($allSellersStock) === 1): ?>
+<div class="card seller-dash-card" style="margin-bottom:14px;">
+  <div class="card-body">
+    <p class="stock-empty-note" style="margin:0;">
+      <i class="fa fa-info-circle"></i>
+      <?= isset($_stock_no_seller) ? $_stock_no_seller : 'No other vendor registered on this session' ?> (<?= htmlspecialchars($seller_session_name) ?>).
+    </p>
+  </div>
+</div>
+<?php endif; ?>
+
+<?php foreach ($allSellersStock as $sk => $sdata): ?>
+<?php $sellerTotal = array_sum($sdata['stock']); ?>
+<div class="card seller-dash-card" style="margin-bottom:14px;">
+  <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+    <h3 style="margin:0;">
+      <i class="fa fa-<?= $sdata['is_self'] ? 'user' : 'user-o' ?>"></i>
+      <?= htmlspecialchars($sdata['name']) ?>
+      <?php if ($sdata['is_self']): ?>
+      <small style="font-size:12px;font-weight:normal;color:#20a8d8;margin-left:6px;"><?= isset($_stock_your) ? $_stock_your : 'Votre stock' ?></small>
+      <?php endif; ?>
+    </h3>
+    <span class="stock-board-total-badge<?= $sellerTotal === 0 ? ' empty' : '' ?>">
+      <?= $sellerTotal ?> vcr
+    </span>
+  </div>
+  <div class="card-body" style="padding:10px 12px 4px;">
+    <?php if (empty($sdata['stock'])): ?>
+      <div class="stock-empty-note"><i class="fa fa-inbox"></i> <?= isset($_stock_no_ticket) ? $_stock_no_ticket : 'No tickets available' ?></div>
     <?php else: ?>
-    <?php if (count($allSellersStock) === 1): ?>
-      <p class="stock-empty-note" style="margin-bottom:14px;">
-        <i class="fa fa-info-circle"></i>
-        <?= isset($_stock_no_seller) ? $_stock_no_seller : 'No other vendor registered on this session' ?> (<?= htmlspecialchars($seller_session_name) ?>).
-      </p>
-    <?php endif; ?>
-    <div class="stock-board-grid">
-      <?php foreach ($allSellersStock as $sk => $sdata): ?>
-      <?php $sellerTotal = array_sum($sdata['stock']); ?>
-      <div class="stock-board-card<?= $sdata['is_self'] ? ' stock-board-card-self' : '' ?>">
-        <div class="stock-board-card-header">
-          <div>
-            <div class="stock-board-card-title">
-              <i class="fa fa-<?= $sdata['is_self'] ? 'user' : 'user-o' ?>"></i>
-              <?= htmlspecialchars($sdata['name']) ?>
-            </div>
-            <?php if ($sdata['is_self']): ?><div class="stock-board-card-self-label"><?= isset($_stock_your) ? $_stock_your : 'Your stock' ?></div><?php endif; ?>
-          </div>
-          <span class="stock-board-total-badge<?= $sellerTotal === 0 ? ' empty' : '' ?>">
-            <?= $sellerTotal ?> vcr
-          </span>
-        </div>
-        <div class="stock-board-card-body">
-          <?php if (empty($sdata['stock'])): ?>
-            <div class="stock-empty-note"><i class="fa fa-inbox"></i> <?= isset($_stock_no_ticket) ? $_stock_no_ticket : 'No tickets available' ?></div>
+    <div class="row dashboard-hotspot-grid">
+      <?php $sbColors = ['bg-blue','bg-green','bg-yellow','bg-red']; $sbci = 0; ?>
+      <?php foreach ($sdata['stock'] as $prof => $qty): ?>
+      <div class="col-3 col-box-6">
+        <div class="box <?= $qty <= 5 ? 'bg-red' : $sbColors[$sbci % 4] ?> bmh-75">
+          <?php if ($sdata['is_self']): ?>
+          <a href="./sellers.php?action=transfer">
           <?php else: ?>
-            <?php foreach ($sdata['stock'] as $prof => $qty): ?>
-            <div class="stock-profile-row">
-              <span class="stock-profile-name"><?= htmlspecialchars($prof) ?></span>
-              <span class="stock-profile-qty <?= $qty <= 5 ? 'qty-low' : 'qty-ok' ?>"><?= $qty ?></span>
-              <?php if (!$sdata['is_self']): ?>
-              <button type="button" class="stock-request-btn"
-                      onclick="openReqModal('<?= htmlspecialchars($sk, ENT_QUOTES) ?>',
-                               '<?= htmlspecialchars($sdata['name'], ENT_QUOTES) ?>',
-                               '<?= htmlspecialchars($prof, ENT_QUOTES) ?>', <?= (int)$qty ?>)">
-                <i class="fa fa-arrow-circle-left"></i> <?= isset($_stock_request_btn) ? $_stock_request_btn : 'Request' ?>
-              </button>
-              <?php endif; ?>
-            </div>
-            <?php endforeach; ?>
-            <?php if (!$sdata['is_self']): ?>
-            <button type="button" class="stock-request-all-btn"
-                    onclick="openReqModal('<?= htmlspecialchars($sk, ENT_QUOTES) ?>',
-                             '<?= htmlspecialchars($sdata['name'], ENT_QUOTES) ?>', '', 0)">
-              <i class="fa fa-exchange"></i> <?= isset($_stock_request_all) ? $_stock_request_all : 'Request a transfer…' ?>
-            </button>
-            <?php endif; ?>
+          <a href="#" onclick="openReqModal('<?= htmlspecialchars($sk, ENT_QUOTES) ?>','<?= htmlspecialchars($sdata['name'], ENT_QUOTES) ?>','<?= htmlspecialchars($prof, ENT_QUOTES) ?>',<?= (int)$qty ?>);return false;">
           <?php endif; ?>
+            <h1><?= $qty ?><span class="box-stat-unit"> vcr</span></h1>
+            <div><i class="fa fa-tag"></i> <?= htmlspecialchars($prof) ?></div>
+          </a>
         </div>
       </div>
+      <?php $sbci++; ?>
       <?php endforeach; ?>
     </div>
+    <?php if (!$sdata['is_self']): ?>
+    <div style="margin:8px 0;">
+      <button type="button" class="stock-request-all-btn"
+              onclick="openReqModal('<?= htmlspecialchars($sk, ENT_QUOTES) ?>','<?= htmlspecialchars($sdata['name'], ENT_QUOTES) ?>','',0)">
+        <i class="fa fa-exchange"></i> <?= isset($_stock_request_all) ? $_stock_request_all : 'Request a transfer…' ?>
+      </button>
+    </div>
+    <?php endif; ?>
     <?php endif; ?>
   </div>
 </div>
+<?php endforeach; ?>
+<?php endif; ?>
 
 <?php $sentRequests = tr_get_sent_by($sellerUsername, 15); ?>
 <?php if (!empty($sentRequests)): ?>
@@ -1145,40 +1153,45 @@ document.getElementById('reqModal').addEventListener('click', function (e) {
     <?php endif; ?>
 
     <!-- Stock disponible -->
-    <div style="margin-bottom:20px;">
-      <h4 style="margin-bottom:10px;">
-        <i class="fa fa-archive"></i>
-        <?= isset($_transfer_available) ? $_transfer_available : 'Available stock' ?>
-        — <span style="color:#2980b9;"><?= htmlspecialchars($sellerName) ?></span>
-      </h4>
-      <?php if (empty($sellerStock)): ?>
-        <div class="portal-empty-note" style="padding:12px;background:#f8f9fa;border-radius:5px;color:#888;">
-          <i class="fa fa-info-circle"></i> <?= isset($_transfer_no_stock) ? $_transfer_no_stock : 'No unused tickets available' ?>
+    <div class="card seller-dash-card" style="margin-bottom:20px;">
+      <div class="card-header">
+        <h4 style="margin:0;"><i class="fa fa-archive"></i>
+          <?= isset($_transfer_available) ? $_transfer_available : 'Stock disponible' ?>
+          — <?= htmlspecialchars($sellerName) ?>
+        </h4>
+      </div>
+      <div class="card-body" style="padding:10px 12px 4px;">
+        <?php if (empty($sellerStock)): ?>
+          <div class="portal-empty-note" style="padding:12px;background:#f8f9fa;border-radius:5px;color:#888;">
+            <i class="fa fa-info-circle"></i> <?= isset($_transfer_no_stock) ? $_transfer_no_stock : 'No unused tickets available' ?>
+          </div>
+        <?php else: ?>
+        <div class="row dashboard-hotspot-grid">
+          <?php
+            $stockColors = ['bg-blue','bg-green','bg-yellow','bg-red'];
+            $sci = 0;
+            foreach ($sellerStock as $prof => $qty):
+          ?>
+          <div class="col-3 col-box-6">
+            <div class="box <?= $stockColors[$sci++ % 4] ?> bmh-75">
+              <a href="#">
+                <h1><?= $qty ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-tag"></i> <?= htmlspecialchars($prof) ?></div>
+              </a>
+            </div>
+          </div>
+          <?php endforeach; ?>
+          <div class="col-3 col-box-6">
+            <div class="box bg-blue bmh-75">
+              <a href="#">
+                <h1><?= array_sum($sellerStock) ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-archive"></i> Total</div>
+              </a>
+            </div>
+          </div>
         </div>
-      <?php else: ?>
-        <div class="table-responsive">
-        <table class="table table-bordered" style="max-width:480px;">
-          <thead class="thead-light">
-            <tr>
-              <th><?= isset($_transfer_profile) ? $_transfer_profile : 'Profile' ?></th>
-              <th class="text-center"><?= isset($_seller_qty) ? $_seller_qty : 'Qty' ?></th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($sellerStock as $prof => $qty): ?>
-            <tr>
-              <td><?= htmlspecialchars($prof) ?></td>
-              <td class="text-center"><b><?= $qty ?></b></td>
-            </tr>
-            <?php endforeach; ?>
-            <tr class="seller-total-row">
-              <td><b>Total</b></td>
-              <td class="text-center"><b><?= array_sum($sellerStock) ?></b></td>
-            </tr>
-          </tbody>
-        </table>
-        </div>
-      <?php endif; ?>
+        <?php endif; ?>
+      </div>
     </div>
 
     <!-- Formulaire de transfert -->
@@ -1315,18 +1328,34 @@ if (!empty($unusedTickets)) {
 }
 ?>
     <!-- Stats rapides -->
-    <div class="seller-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
-      <div style="flex:1;min-width:130px;background:#e3f2fd;border-radius:8px;padding:10px 14px;">
-        <div style="font-size:11px;color:#1565c0;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-list-ul"></i> Total</div>
-        <div style="font-size:24px;font-weight:bold;color:#1565c0;"><?= $totalTickets ?></div>
-      </div>
-      <div style="flex:1;min-width:130px;background:#e8f5e9;border-radius:8px;padding:10px 14px;border:1px solid #a5d6a7;">
-        <div style="font-size:11px;color:#2e7d32;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-archive"></i> Stock (non utilisé)</div>
-        <div style="font-size:24px;font-weight:bold;color:#2e7d32;"><?= $unusedCount ?></div>
-      </div>
-      <div style="flex:1;min-width:130px;background:#fff8e1;border-radius:8px;padding:10px 14px;border:1px solid #ffe082;">
-        <div style="font-size:11px;color:#f57f17;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-check-circle"></i> Utilisés</div>
-        <div style="font-size:24px;font-weight:bold;color:#f57f17;"><?= $usedCount ?></div>
+    <div class="card seller-dash-card" style="margin-bottom:16px;">
+      <div class="card-body" style="padding:10px 12px 4px;">
+        <div class="row dashboard-hotspot-grid">
+          <div class="col-3 col-box-6">
+            <div class="box bg-blue bmh-75">
+              <a href="#">
+                <h1><?= $totalTickets ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-list-ul"></i> Total</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-green bmh-75">
+              <a href="#">
+                <h1><?= $unusedCount ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-archive"></i> Stock (non utilisé)</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-yellow bmh-75">
+              <a href="#">
+                <h1><?= $usedCount ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-check-circle"></i> Utilisés</div>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1635,103 +1664,158 @@ filterTicketRows();
     </div>
   </div>
 
-  <!-- ── Grandes cartes (CSS Grid responsive) ───────────────────────── -->
-  <div class="dash-cards-grid">
+  <!-- ── Ventes ───────────────────────────────────────────────────────── -->
+  <div class="card seller-dash-card" style="margin-bottom:14px;">
+    <div class="card-header"><h3><i class="fa fa-shopping-cart"></i> Ventes</h3></div>
+    <div class="card-body">
+      <div class="row dashboard-hotspot-grid">
 
-    <!-- Tickets vendus aujourd'hui -->
-    <a href="./sellers.php?idhr=<?= htmlspecialchars($today_str) ?>" class="dash-card" style="background:#c0392b;">
-      <div class="dash-card-bg-icon"><i class="fa fa-sun-o"></i></div>
-      <div>
-        <div class="dash-card-num"><?= $todaySalesCount ?></div>
-        <div class="dash-card-label"><i class="fa fa-ticket"></i> <?= isset($_tickets_sold_today) ? $_tickets_sold_today : 'Tickets sold today' ?></div>
-        <div class="dash-card-sub"><?= $todayRevenue > 0 ? mikhmon_format_money_amount($todayRevenue, $currency, $cekindo) : (isset($_no_sales) ? $_no_sales : 'No sales') ?></div>
-      </div>
-    </a>
-
-    <!-- Tickets vendus ce mois -->
-    <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>" class="dash-card" style="background:#2980b9;">
-      <div class="dash-card-bg-icon"><i class="fa fa-calendar"></i></div>
-      <div>
-        <div class="dash-card-num"><?= $monthSalesCount ?></div>
-        <div class="dash-card-label"><i class="fa fa-ticket"></i> <?= isset($_vouchers) ? $_vouchers : 'Tickets' ?> — <?= date('M Y') ?></div>
-        <div class="dash-card-sub"><?= $monthRevenue > 0 ? mikhmon_format_money_amount($monthRevenue, $currency, $cekindo) : (isset($_no_sales) ? $_no_sales : 'No sales') ?></div>
-      </div>
-    </a>
-
-    <!-- Stock disponible → liste tickets -->
-    <a href="./sellers.php?action=tickets" class="dash-card" style="background:#27ae60;">
-      <div class="dash-card-bg-icon"><i class="fa fa-archive"></i></div>
-      <div>
-        <div class="dash-card-num"><?= array_sum($sellerStock) ?></div>
-        <div class="dash-card-label"><i class="fa fa-archive"></i> <?= isset($_stock_available) ? $_stock_available : 'Available stock' ?></div>
-        <div class="dash-card-sub">
-          <?php if (!empty($sellerStock)): ?>
-            <?php foreach ($sellerStock as $p => $q): ?><?= htmlspecialchars($p) ?>: <?= $q ?>  <?php endforeach; ?>
-          <?php else: ?><?= isset($_no_stock_in_account) ? $_no_stock_in_account : 'No tickets in stock' ?><?php endif; ?>
+        <div class="col-3 col-box-6">
+          <div class="box bg-blue bmh-75">
+            <a href="./sellers.php?idhr=<?= htmlspecialchars($today_str) ?>">
+              <h1><?= $todaySalesCount ?></h1>
+              <div><i class="fa fa-sun-o"></i> Tickets aujourd'hui</div>
+            </a>
+          </div>
         </div>
-        <div class="dash-card-sub" style="text-decoration:underline;margin-top:4px;"><?= isset($_view_list) ? $_view_list : 'View list →' ?></div>
-      </div>
-    </a>
 
-    <!-- Commission -->
-    <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>" class="dash-card" style="background:#8e44ad;">
-      <div class="dash-card-bg-icon"><i class="fa fa-percent"></i></div>
-      <div>
-        <?php if ($sellerCommissionRate > 0): ?>
-        <div class="dash-card-num" style="font-size:clamp(20px,3.5vw,32px);"><?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></div>
-        <div class="dash-card-label"><i class="fa fa-percent"></i> Ma commission (<?= $sellerCommissionRate ?>%)</div>
-        <div class="dash-card-sub">Net caisse: <?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></div>
-        <?php else: ?>
-        <div class="dash-card-num">—</div>
-        <div class="dash-card-label"><i class="fa fa-percent"></i> Commission</div>
-        <div class="dash-card-sub">Non configurée</div>
-        <?php endif; ?>
-      </div>
-    </a>
+        <div class="col-3 col-box-6">
+          <div class="box bg-green bmh-75">
+            <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>">
+              <h1><?= $monthSalesCount ?></h1>
+              <div><i class="fa fa-calendar"></i> Bons du mois</div>
+            </a>
+          </div>
+        </div>
 
+        <div class="col-3 col-box-6">
+          <div class="box bg-yellow bmh-75">
+            <a href="./sellers.php?action=tickets">
+              <h1><?= array_sum($sellerStock) ?></h1>
+              <div><i class="fa fa-archive"></i> Stock disponible</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-red bmh-75">
+            <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>">
+              <?php if ($sellerCommissionRate > 0): ?>
+              <h1><?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-percent"></i> Commission (<?= $sellerCommissionRate ?>%)</div>
+              <?php else: ?>
+              <h1>—</h1>
+              <div><i class="fa fa-percent"></i> Commission</div>
+              <?php endif; ?>
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
-  <!-- Revenus -->
+  <!-- ── Revenus ───────────────────────────────────────────────────────── -->
   <?php if ($totalRevenue > 0): ?>
-  <div class="card" style="margin-bottom:14px;">
-    <div class="card-header" style="display:flex;align-items:center;gap:10px;">
-      <i class="fa fa-money" style="font-size:18px;"></i>
-      <h4 style="margin:0;">Revenus</h4>
-    </div>
-    <div class="card-body" style="padding:14px 18px;">
-      <div class="dash-revenue-row">
-        <div class="dash-revenue-col">
-          <div class="portal-muted-light" style="font-size:12px;color:#aaa;margin-bottom:2px;">Aujourd'hui <?= $todaySalesCount ?> vcr</div>
-          <div style="font-size:20px;font-weight:bold;color:#c0392b;"><?= mikhmon_format_money_amount($todayRevenue, $currency, $cekindo) ?></div>
+  <div class="card seller-dash-card" style="margin-bottom:14px;">
+    <div class="card-header"><h3><i class="fa fa-money"></i> Revenus</h3></div>
+    <div class="card-body">
+      <div class="row dashboard-hotspot-grid">
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-blue bmh-75">
+            <a href="./sellers.php?idhr=<?= htmlspecialchars($today_str) ?>">
+              <h1><?= mikhmon_format_money_amount($todayRevenue, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-sun-o"></i> Aujourd'hui (<?= $todaySalesCount ?> vcr)</div>
+            </a>
+          </div>
         </div>
-        <div class="dash-revenue-col">
-          <div class="portal-muted-light" style="font-size:12px;color:#aaa;margin-bottom:2px;"><?= date('M Y') ?> (<?= $monthSalesCount ?> vcr)</div>
-          <div style="font-size:20px;font-weight:bold;color:#2980b9;"><?= mikhmon_format_money_amount($monthRevenue, $currency, $cekindo) ?></div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-green bmh-75">
+            <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>">
+              <h1><?= mikhmon_format_money_amount($monthRevenue, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-calendar"></i> <?= date('M Y') ?> (<?= $monthSalesCount ?> vcr)</div>
+            </a>
+          </div>
         </div>
-        <?php if ($sellerCommissionRate > 0): ?>
-        <div class="dash-revenue-col">
-          <div class="portal-muted-light" style="font-size:12px;color:#aaa;margin-bottom:2px;">Net caisse (−<?= $sellerCommissionRate ?>%)</div>
-          <div style="font-size:20px;font-weight:bold;color:#27ae60;"><?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-yellow bmh-75">
+            <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>">
+              <?php if ($sellerCommissionRate > 0): ?>
+              <h1><?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-bank"></i> Net caisse (−<?= $sellerCommissionRate ?>%)</div>
+              <?php else: ?>
+              <h1><?= mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-bank"></i> Total encaissé</div>
+              <?php endif; ?>
+            </a>
+          </div>
         </div>
-        <?php endif; ?>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-red bmh-75">
+            <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>">
+              <?php if ($sellerCommissionRate > 0): ?>
+              <h1><?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-percent"></i> Ma commission</div>
+              <?php else: ?>
+              <h1>—</h1>
+              <div><i class="fa fa-percent"></i> Commission</div>
+              <?php endif; ?>
+            </a>
+          </div>
+        </div>
+
       </div>
     </div>
   </div>
   <?php endif; ?>
 
-  <!-- Accès rapide -->
-  <div class="card">
-    <div class="card-header"><h4 style="margin:0;"><i class="fa fa-bolt"></i> Accès rapide</h4></div>
-    <div class="card-body" style="padding:14px 18px;display:flex;gap:10px;flex-wrap:wrap;">
-      <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>" class="btn btn-sm bg-primary" style="padding:8px 16px;">
-        <i class="fa fa-ticket"></i> Ventes du mois
-      </a>
-      <a href="./sellers.php?action=tickets" class="btn btn-sm" style="padding:8px 16px;background:#27ae60;color:#fff;">
-        <i class="fa fa-list-ul"></i> Mes Tickets (<?= array_sum($sellerStock) ?> en stock)
-      </a>
-      <a href="./sellers.php?action=transfer" class="btn btn-sm" style="padding:8px 16px;background:#e67e22;color:#fff;">
-        <i class="fa fa-exchange"></i> Transfert stock
-      </a>
+  <!-- ── Accès rapide ───────────────────────────────────────────────────── -->
+  <div class="card seller-dash-card">
+    <div class="card-header"><h3><i class="fa fa-bolt"></i> Accès rapide</h3></div>
+    <div class="card-body">
+      <div class="row dashboard-hotspot-grid">
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-blue bmh-75">
+            <a href="./sellers.php?idbl=<?= strtolower(date('M')).date('Y') ?>">
+              <h1><i class="fa fa-ticket"></i></h1>
+              <div>Ventes du mois</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-green bmh-75">
+            <a href="./sellers.php?action=tickets">
+              <h1><i class="fa fa-list-ul"></i></h1>
+              <div>Mes Tickets (<?= array_sum($sellerStock) ?> en stock)</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-yellow bmh-75">
+            <a href="./sellers.php?action=transfer">
+              <h1><i class="fa fa-exchange"></i></h1>
+              <div>Transfert stock</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-red bmh-75">
+            <a href="./sellers.php?idhr=<?= htmlspecialchars($today_str) ?>">
+              <h1><i class="fa fa-sun-o"></i></h1>
+              <div>Ventes du jour</div>
+            </a>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -1837,119 +1921,117 @@ filterTicketRows();
     </div>
   </div>
 
-  <!-- ── Bloc commission + résumé ───────────────────────────────────────── -->
+  <!-- ── Résumé ────────────────────────────────────────────────────────── -->
   <?php $totalStockVendor = array_sum($sellerStock); ?>
 
-  <?php if ($sellerCommissionRate > 0 && $totalRevenue > 0): ?>
-  <!-- Bannière commission : Ventes − Commission = Net -->
-  <div class="portal-recap-banner" style="background:linear-gradient(135deg,#7d3c98,#5b2c8d);border-radius:12px;padding:18px 22px;margin-bottom:14px;color:#fff;position:relative;overflow:hidden;">
-    <div class="portal-recap-banner__icon" style="position:absolute;right:-20px;top:-20px;font-size:100px;opacity:.08;"><i class="fa fa-calculator"></i></div>
-    <div class="portal-recap-banner__title" style="font-size:12px;font-weight:bold;text-transform:uppercase;letter-spacing:1px;opacity:.85;margin-bottom:12px;">
-      <i class="fa fa-star"></i> Récapitulatif — <?= htmlspecialchars($sellerName) ?>
+  <div class="card seller-dash-card seller-sales-summary-row" style="margin-bottom:14px;">
+    <div class="card-header"><h3><i class="fa fa-bar-chart"></i> Résumé — <?= htmlspecialchars($sellerName) ?></h3></div>
+    <div class="card-body">
+      <div class="row dashboard-hotspot-grid seller-sales-summary-grid">
+
+        <div class="col-3 col-box-6 seller-bootstrap-col">
+          <div class="box bg-blue bmh-75">
+            <a href="#">
+              <h1><?= $TotalReg ?><span class="box-stat-unit"> vcr</span></h1>
+              <div><i class="fa fa-ticket"></i> <?= isset($_vouchers) ? $_vouchers : 'Bons vendus' ?></div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6 seller-bootstrap-col">
+          <div class="box bg-green bmh-75">
+            <a href="#">
+              <h1><?= $totalRevenue > 0 ? mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) : '—' ?></h1>
+              <div><i class="fa fa-money"></i> <?= isset($_seller_ca) ? $_seller_ca : 'Chiffre d\'affaires' ?></div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6 seller-bootstrap-col">
+          <div class="box bg-yellow bmh-75">
+            <a href="#">
+              <?php if ($sellerCommissionRate > 0 && $totalRevenue > 0): ?>
+              <h1><?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-percent"></i> Commission <?= $sellerCommissionRate ?>%</div>
+              <?php elseif ($sellerCommissionRate > 0): ?>
+              <h1><?= isset($currency) ? $currency : '' ?> 0</h1>
+              <div><i class="fa fa-percent"></i> Commission <?= $sellerCommissionRate ?>%</div>
+              <?php else: ?>
+              <h1>—</h1>
+              <div><i class="fa fa-percent"></i> Commission</div>
+              <?php endif; ?>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6 seller-bootstrap-col">
+          <div class="box bg-red bmh-75">
+            <a href="./sellers.php?action=tickets">
+              <h1><?= $totalStockVendor ?><span class="box-stat-unit"> vcr</span></h1>
+              <div class="seller-sales-stock-list"><i class="fa fa-archive"></i> Stock disponible
+                <?php if (!empty($sellerStock)): foreach ($sellerStock as $p => $q): ?>
+                · <?= htmlspecialchars($p) ?>:<?= $q ?>
+                <?php endforeach; endif; ?>
+              </div>
+            </a>
+          </div>
+        </div>
+
+      </div>
     </div>
-    <!-- Formule : Ventes − Commission = Net caisse -->
-    <div class="comm-formula-row" style="display:flex;align-items:stretch;flex-wrap:wrap;gap:8px;">
+  </div>
 
-      <!-- Ventes -->
-      <div class="comm-formula-cell portal-recap-card" style="background:rgba(255,255,255,.12);border-radius:8px;padding:10px 16px;text-align:center;min-width:120px;">
-        <div style="font-size:11px;opacity:.75;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;">Ventes totales</div>
-        <div style="font-size:22px;font-weight:bold;"><?= mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) ?></div>
-        <div style="font-size:11px;opacity:.6;margin-top:2px;"><?= $TotalReg ?> ticket<?= $TotalReg > 1 ? 's' : '' ?></div>
+  <!-- ── Formule commission ─────────────────────────────────────────────── -->
+  <?php if ($sellerCommissionRate > 0 && $totalRevenue > 0): ?>
+  <div class="card seller-dash-card" style="margin-bottom:14px;">
+    <div class="card-header"><h3><i class="fa fa-calculator"></i> Calcul commission</h3></div>
+    <div class="card-body">
+      <div class="row dashboard-hotspot-grid">
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-blue bmh-75">
+            <a href="#">
+              <h1><?= mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-money"></i> Ventes totales · <?= $TotalReg ?> vcr</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-yellow bmh-75">
+            <a href="#">
+              <h1><?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-percent"></i> − Commission <?= $sellerCommissionRate ?>%</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-green bmh-75">
+            <a href="#">
+              <h1><?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></h1>
+              <div><i class="fa fa-bank"></i> = Net caisse · <?= $sellerCommissionRate ?>% déduit</div>
+            </a>
+          </div>
+        </div>
+
+        <div class="col-3 col-box-6">
+          <div class="box bg-red bmh-75">
+            <a href="#">
+              <h1><?= $sellerCommissionRate ?><span class="box-stat-unit">%</span></h1>
+              <div><i class="fa fa-scissors"></i> Taux commission</div>
+            </a>
+          </div>
+        </div>
+
       </div>
-
-      <!-- Opérateur − -->
-      <div class="comm-formula-op portal-recap-op" style="display:flex;align-items:center;font-size:28px;opacity:.5;font-weight:300;">−</div>
-
-      <!-- Commission -->
-      <div class="comm-formula-cell portal-recap-card" style="background:rgba(255,255,255,.12);border-radius:8px;padding:10px 16px;text-align:center;min-width:120px;">
-        <div style="font-size:11px;opacity:.75;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-percent"></i> Ma commission</div>
-        <div style="font-size:22px;font-weight:bold;"><?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></div>
-        <div style="font-size:11px;opacity:.6;margin-top:2px;"><?= $sellerCommissionRate ?>% des ventes</div>
-      </div>
-
-      <!-- Opérateur = -->
-      <div class="comm-formula-op portal-recap-op" style="display:flex;align-items:center;font-size:28px;opacity:.5;font-weight:300;">=</div>
-
-      <!-- Net caisse (mis en avant) -->
-      <div class="comm-formula-cell portal-recap-card portal-recap-card--focus" style="background:rgba(255,255,255,.22);border-radius:10px;padding:12px 20px;text-align:center;border:2px solid rgba(255,255,255,.5);min-width:140px;">
-        <div style="font-size:11px;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;opacity:.9;"><i class="fa fa-bank"></i> Net caisse</div>
-        <div style="font-size:28px;font-weight:bold;letter-spacing:1px;"><?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></div>
-        <div style="font-size:11px;opacity:.65;margin-top:2px;"><?= $sellerCommissionRate ?>% déduit</div>
-      </div>
-
     </div>
   </div>
   <?php endif; ?>
 
-  <!-- Cartes résumé (tickets / CA / stock) -->
-  <div class="row" style="margin-bottom:12px;">
-    <div class="col-12 seller-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;">
-
-      <!-- Tickets vendus -->
-      <div style="flex:1;min-width:140px;background:#e3f2fd;border-radius:8px;padding:12px 16px;">
-        <div style="font-size:11px;color:#1565c0;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;">
-          <i class="fa fa-ticket"></i> <?= isset($_vouchers) ? $_vouchers : 'Tickets' ?>
-        </div>
-        <div style="font-size:28px;font-weight:bold;color:#1565c0;"><?= $TotalReg ?></div>
-      </div>
-
-      <!-- Chiffre d'affaires -->
-      <?php if ($totalRevenue > 0): ?>
-      <div style="flex:1;min-width:140px;background:#fff8e1;border-radius:8px;padding:12px 16px;border:1px solid #ffe082;">
-        <div style="font-size:11px;color:#f57f17;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;">
-          <i class="fa fa-money"></i> <?= isset($_seller_ca) ? $_seller_ca : 'Ventes' ?>
-        </div>
-        <div style="font-size:20px;font-weight:bold;color:#f57f17;">
-          <?= mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) ?>
-        </div>
-      </div>
-      <?php endif; ?>
-
-      <!-- Commission (résumé compact, déjà mis en avant ci-dessus) -->
-      <?php if ($sellerCommissionRate > 0 && $totalRevenue > 0): ?>
-      <div style="flex:1;min-width:140px;background:#f3e8fd;border-radius:8px;padding:12px 16px;border:2px solid #8e44ad;">
-        <div style="font-size:11px;color:#8e44ad;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;">
-          <i class="fa fa-percent"></i> Commission <?= $sellerCommissionRate ?>%
-        </div>
-        <div style="font-size:20px;font-weight:bold;color:#8e44ad;">
-          <?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?>
-        </div>
-      </div>
-      <?php elseif ($sellerCommissionRate > 0): ?>
-      <div style="flex:1;min-width:140px;background:#f3e8fd;border-radius:8px;padding:12px 16px;border:1px dashed #ce93d8;">
-        <div style="font-size:11px;color:#8e44ad;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;">
-          <i class="fa fa-percent"></i> Commission <?= $sellerCommissionRate ?>%
-        </div>
-        <div class="portal-soft-accent" style="font-size:20px;font-weight:bold;color:#ce93d8;"><?= isset($currency) ? $currency : '' ?> 0</div>
-        <div class="portal-empty-note" style="font-size:11px;color:#aaa;"><?= isset($_no_sales_period) ? $_no_sales_period : 'No sales for this period' ?></div>
-      </div>
-      <?php endif; ?>
-
-      <!-- Stock disponible -->
-      <div style="flex:1;min-width:140px;background:<?= $totalStockVendor > 0 ? '#e8f5e9' : '#fafafa' ?>;border-radius:8px;padding:12px 16px;border:1px solid <?= $totalStockVendor > 0 ? '#a5d6a7' : '#e0e0e0' ?>;">
-        <div style="font-size:11px;color:<?= $totalStockVendor > 0 ? '#2e7d32' : '#999' ?>;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;">
-          <i class="fa fa-archive"></i> <?= isset($_transfer_available) ? $_transfer_available : 'Stock' ?>
-        </div>
-        <div style="font-size:28px;font-weight:bold;color:<?= $totalStockVendor > 0 ? '#2e7d32' : '#bbb' ?>;">
-          <?= $totalStockVendor ?>
-        </div>
-        <?php if (!empty($sellerStock)): ?>
-        <div style="font-size:11px;color:#666;margin-top:4px;">
-          <?php foreach ($sellerStock as $p => $q): ?>
-            <span style="background:#fff;border-radius:10px;padding:1px 8px;margin-right:4px;border:1px solid #c8e6c9;">
-              <?= htmlspecialchars($p) ?>: <b><?= $q ?></b>
-            </span>
-          <?php endforeach; ?>
-        </div>
-        <?php endif; ?>
-      </div>
-
-    </div>
-  </div>
-
   <!-- Tableau des ventes avec commission par ligne -->
   <div class="overflow box-bordered table-responsive portal-sales-table-wrap" style="max-height:70vh">
-    <table id="dataTable" class="table table-bordered table-hover text-nowrap portal-sales-table">
+    <table id="dataTable" class="table table-bordered table-hover text-nowrap portal-sales-table seller-sales-table">
       <thead class="thead-light">
         <tr>
           <th>&#8470;</th>
@@ -1968,35 +2050,37 @@ filterTicketRows();
         <?php
           $rowNum = 1;
           $colCount = $sellerCommissionRate > 0 ? 8 : 5;
-          foreach ($getData as $sale) {
+          foreach ($getData as $sale):
               $salePrice = mikhmon_parse_money_amount(isset($sale['price']) ? $sale['price'] : 0);
               $saleComm  = $salePrice * $sellerCommissionRate / 100;
               $saleNet   = $salePrice - $saleComm;
-              echo "<tr>";
-              echo "<td>" . $rowNum++ . "</td>";
-              echo "<td>" . htmlspecialchars($sale['date'])    . "</td>";
-              echo "<td>" . htmlspecialchars($sale['time'])    . "</td>";
-              echo "<td>" . htmlspecialchars($sale['user'])    . "</td>";
-              echo "<td>" . htmlspecialchars($sale['profile']) . "</td>";
-              if ($sellerCommissionRate > 0) {
-                  echo '<td class="text-right" style="color:#f57f17;">' . mikhmon_format_money_amount($salePrice, $currency, $cekindo) . '</td>';
-                  echo '<td class="text-right" style="color:#8e44ad;font-weight:bold;">− ' . mikhmon_format_money_amount($saleComm, $currency, $cekindo) . '</td>';
-                  echo '<td class="text-right" style="color:#27ae60;font-weight:bold;">' . mikhmon_format_money_amount($saleNet, $currency, $cekindo) . '</td>';
-              }
-              echo "</tr>";
-          }
+        ?>
+        <tr>
+          <td data-label="№"><span class="seller-sales-cell-value"><?= $rowNum++ ?></span></td>
+          <td data-label="<?= htmlspecialchars($_date) ?>"><span class="seller-sales-cell-value"><?= htmlspecialchars($sale['date']) ?></span></td>
+          <td data-label="<?= htmlspecialchars($_time) ?>"><span class="seller-sales-cell-value"><?= htmlspecialchars($sale['time']) ?></span></td>
+          <td data-label="<?= htmlspecialchars($_user_name) ?>"><span class="seller-sales-cell-value"><?= htmlspecialchars($sale['user']) ?></span></td>
+          <td data-label="<?= htmlspecialchars($_profile) ?>"><span class="seller-sales-cell-value"><?= htmlspecialchars($sale['profile']) ?></span></td>
+          <?php if ($sellerCommissionRate > 0): ?>
+          <td class="text-right" data-label="Prix" style="color:#f57f17;"><span class="seller-sales-cell-value"><?= mikhmon_format_money_amount($salePrice, $currency, $cekindo) ?></span></td>
+          <td class="text-right" data-label="Commission <?= (int)$sellerCommissionRate ?>%" style="color:#8e44ad;font-weight:bold;"><span class="seller-sales-cell-value">− <?= mikhmon_format_money_amount($saleComm, $currency, $cekindo) ?></span></td>
+          <td class="text-right" data-label="Net caisse" style="color:#27ae60;font-weight:bold;"><span class="seller-sales-cell-value"><?= mikhmon_format_money_amount($saleNet, $currency, $cekindo) ?></span></td>
+          <?php endif; ?>
+        </tr>
+        <?php endforeach; ?>
+        <?php
           if ($TotalReg === 0) {
-              echo '<tr><td colspan="' . $colCount . '" class="text-center"><i class="fa fa-info-circle"></i> ' . (isset($_seller_no_sales) ? $_seller_no_sales : 'No sales found') . '</td></tr>';
+              echo '<tr class="seller-sales-empty-row"><td colspan="' . $colCount . '" class="text-center" data-label=""><span class="seller-sales-cell-value"><i class="fa fa-info-circle"></i> ' . (isset($_seller_no_sales) ? $_seller_no_sales : 'No sales found') . '</span></td></tr>';
           }
         ?>
       </tbody>
       <?php if ($TotalReg > 0 && $sellerCommissionRate > 0): ?>
       <tfoot>
         <tr class="seller-sales-total-row">
-          <td colspan="5"><i class="fa fa-sigma"></i> TOTAL (<?= $TotalReg ?> ticket<?= $TotalReg > 1 ? 's' : '' ?>)</td>
-          <td class="text-right total-gross"><?= mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) ?></td>
-          <td class="text-right total-commission">− <?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></td>
-          <td class="text-right total-net"><?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></td>
+          <td colspan="5" data-label="Total"><span class="seller-sales-cell-value"><i class="fa fa-sigma"></i> TOTAL (<?= $TotalReg ?> ticket<?= $TotalReg > 1 ? 's' : '' ?>)</span></td>
+          <td class="text-right total-gross" data-label="Prix"><span class="seller-sales-cell-value"><?= mikhmon_format_money_amount($totalRevenue, $currency, $cekindo) ?></span></td>
+          <td class="text-right total-commission" data-label="Commission <?= (int)$sellerCommissionRate ?>%"><span class="seller-sales-cell-value">− <?= mikhmon_format_money_amount($sellerCommissionAmount, $currency, $cekindo) ?></span></td>
+          <td class="text-right total-net" data-label="Net caisse"><span class="seller-sales-cell-value"><?= mikhmon_format_money_amount($totalNetRevenue, $currency, $cekindo) ?></span></td>
         </tr>
       </tfoot>
       <?php endif; ?>

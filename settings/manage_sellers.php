@@ -827,55 +827,59 @@ if (isset($_POST['admin_send_accounting_notice'])) {
     <?php if (empty($sellers_data)): ?>
       <p class="text-center"><i class="fa fa-info-circle"></i> <?= $_no_seller_registered ?></p>
     <?php else: ?>
-    <div class="table-responsive portal-table-wrap">
-    <table class="table table-bordered table-hover portal-table-min-lg">
-      <thead class="thead-light">
-        <tr>
-          <th style="color:#e74c3c;"><b><?= $_seller_id ?></b></th>
-          <th style="color:#e74c3c;"><b><?= $_seller_display_name ?></b></th>
-          <th style="color:#e74c3c;"><b><?= $_seller_session_router ?></b></th>
-          <th class="text-center" style="color:#e74c3c;"><b><i class="fa fa-percent"></i> Commission</b></th>
-          <th style="color:#e74c3c;"><b><?= $_seller_link ?></b></th>
-          <th style="color:#e74c3c;"><b><?= $_action ?></b></th>
-        </tr>
-      </thead>
-      <tbody>
-        <?php foreach ($sellers_data as $su => $sd): ?>
-        <?php $su_rate = isset($sd['commission']) ? (int)$sd['commission'] : 0; ?>
-        <tr>
-          <td><code><?= htmlspecialchars($su) ?></code></td>
-          <td><?= htmlspecialchars($sd['name']) ?></td>
-          <td><span class="badge"><?= htmlspecialchars($sd['session']) ?></span></td>
-          <td class="text-center">
-            <span style="color:#8e44ad;font-weight:bold;"><?= $su_rate ?>%</span>
-            <a href="#commission_<?= htmlspecialchars($su) ?>" class="btn btn-sm" style="background:#f3e8fd;color:#8e44ad;border:1px solid #ce93d8;margin-left:4px;padding:2px 7px;font-size:11px;" title="Modifier la commission">
-              <i class="fa fa-edit"></i>
-            </a>
-          </td>
-          <td>
-            <a href="../sellers.php" target="_blank" style="font-size:12px;">
-              <i class="fa fa-external-link"></i> sellers.php
-            </a>
-          </td>
-          <td>
+    <div class="row admin-registered-sellers-row">
+      <?php foreach ($sellers_data as $su => $sd): ?>
+      <?php $su_rate = isset($sd['commission']) ? (int)$sd['commission'] : 0; ?>
+      <div class="col-6 col-box-6 admin-registered-seller-col">
+        <div class="admin-registered-seller-card">
+          <div class="admin-registered-seller-head">
+            <div class="admin-registered-seller-title">
+              <i class="fa fa-user"></i>
+              <span><?= htmlspecialchars($sd['name']) ?></span>
+            </div>
+            <code><?= htmlspecialchars($su) ?></code>
+          </div>
+
+          <div class="admin-registered-seller-meta">
+            <div class="admin-registered-seller-meta-item">
+              <span><?= $_seller_session_router ?></span>
+              <strong><?= htmlspecialchars($sd['session']) ?></strong>
+            </div>
+            <div class="admin-registered-seller-meta-item">
+              <span>Commission</span>
+              <strong class="admin-registered-seller-commission">
+                <?= $su_rate ?>%
+                <a href="#commission_<?= htmlspecialchars($su) ?>" title="Modifier la commission">
+                  <i class="fa fa-edit"></i>
+                </a>
+              </strong>
+            </div>
+            <div class="admin-registered-seller-meta-item">
+              <span><?= $_seller_link ?></span>
+              <a href="../sellers.php" target="_blank" class="admin-registered-seller-link">
+                <i class="fa fa-external-link"></i> sellers.php
+              </a>
+            </div>
+          </div>
+
+          <div class="admin-registered-seller-actions">
             <a href="#edit_seller_<?= htmlspecialchars($su) ?>" class="btn bg-primary btn-sm" title="<?= isset($_edit) ? $_edit : 'Edit' ?>">
-              <i class="fa fa-edit"></i>
+              <i class="fa fa-edit"></i> <?= isset($_edit) ? $_edit : 'Edit' ?>
             </a>
-            <form method="post" action="?id=sellers&session=<?= urlencode($session) ?>" onsubmit="return confirm('<?= isset($_delete) ? addslashes($_delete) : 'Delete' ?> <?= htmlspecialchars($su) ?> ?')" style="display:inline;">
+            <a href="#chgpass_<?= htmlspecialchars($su) ?>" class="btn bg-warning btn-sm" title="<?= $_password ?>">
+              <i class="fa fa-key"></i> <?= $_password ?>
+            </a>
+            <form method="post" action="?id=sellers&session=<?= urlencode($session) ?>" onsubmit="return confirm('<?= isset($_delete) ? addslashes($_delete) : 'Delete' ?> <?= htmlspecialchars($su) ?> ?')">
               <?= csrf_field() ?>
               <input type="hidden" name="delete_seller" value="<?= htmlspecialchars($su) ?>">
               <button type="submit" class="btn bg-danger btn-sm" title="<?= isset($_delete) ? $_delete : 'Delete' ?>">
-                <i class="fa fa-trash"></i>
+                <i class="fa fa-trash"></i> <?= isset($_delete) ? $_delete : 'Delete' ?>
               </button>
             </form>
-            <a href="#chgpass_<?= htmlspecialchars($su) ?>" class="btn bg-warning btn-sm" title="<?= $_password ?>">
-              <i class="fa fa-key"></i>
-            </a>
-          </td>
-        </tr>
-        <?php endforeach; ?>
-      </tbody>
-    </table>
+          </div>
+        </div>
+      </div>
+      <?php endforeach; ?>
     </div>
 
     <!-- Formulaires édition compte vendeur -->
@@ -1119,44 +1123,59 @@ if (isset($_POST['admin_send_accounting_notice'])) {
     <?php else: ?>
 
     <!-- Stock par vendeur -->
-    <div style="overflow-x:auto;margin-bottom:18px;">
-    <table class="table table-bordered portal-table-min-sm" style="max-width:600px;font-size:13px;">
-      <thead class="thead-light">
-        <tr>
-          <th><?= isset($_seller) ? $_seller : 'Vendor' ?></th>
-          <th><?= isset($_transfer_profile) ? $_transfer_profile : 'Profile' ?></th>
-          <th class="text-center"><?= isset($_seller_qty) ? $_seller_qty : 'Qty' ?></th>
-        </tr>
-      </thead>
-      <tbody>
-      <?php
-        $hasAny = false;
-        foreach ($allSellerStock as $sk => $profiles):
-            if (empty($profiles)) continue;
-            $hasAny = true;
-            $first = true;
-            $rowspan = count($profiles);
-            foreach ($profiles as $prof => $qty):
-      ?>
-        <tr>
-          <?php if ($first): ?>
-          <td rowspan="<?= $rowspan ?>" style="vertical-align:middle;font-weight:bold;">
-            <?= htmlspecialchars($sellers_data[$sk]['name']) ?>
-            <br><small class="portal-muted-light" style="color:#999;font-weight:normal;"><code><?= htmlspecialchars($sk) ?></code></small>
-          </td>
-          <?php $first = false; endif; ?>
-          <td><?= htmlspecialchars($prof) ?></td>
-          <td class="text-center"><b><?= $qty ?></b></td>
-        </tr>
-      <?php endforeach; endforeach; ?>
-      <?php if (!$hasAny): ?>
-        <tr><td colspan="3" class="text-center" style="color:#888;">
-          <i class="fa fa-info-circle"></i> <?= isset($_transfer_no_stock) ? $_transfer_no_stock : 'No unused tickets available.' ?>
-        </td></tr>
-      <?php endif; ?>
-      </tbody>
-    </table>
+    <?php
+      $hasAny = false;
+      foreach ($allSellerStock as $profiles) {
+          if (!empty($profiles)) {
+              $hasAny = true;
+              break;
+          }
+      }
+    ?>
+    <?php if ($hasAny): ?>
+    <div class="row admin-seller-stock-row">
+      <?php foreach ($allSellerStock as $sk => $profiles): ?>
+        <?php if (empty($profiles)) continue; ?>
+        <?php $sellerStockTotal = array_sum($profiles); ?>
+        <div class="col-6 col-box-6 admin-seller-stock-col">
+          <div class="admin-seller-stock-card">
+            <div class="admin-seller-stock-head">
+              <div class="admin-seller-stock-name">
+                <i class="fa fa-user"></i>
+                <span><?= htmlspecialchars(isset($sellers_data[$sk]['name']) ? $sellers_data[$sk]['name'] : $sk) ?></span>
+                <small><code><?= htmlspecialchars($sk) ?></code></small>
+              </div>
+              <span class="admin-seller-stock-total"><?= $sellerStockTotal ?> vcr</span>
+            </div>
+            <table class="table table-bordered admin-seller-stock-table">
+              <thead class="thead-light">
+                <tr>
+                  <th><?= isset($_transfer_profile) ? $_transfer_profile : 'Profile' ?></th>
+                  <th class="text-center"><?= isset($_seller_qty) ? $_seller_qty : 'Qty' ?></th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($profiles as $prof => $qty): ?>
+                <tr>
+                  <td data-label="<?= isset($_transfer_profile) ? htmlspecialchars($_transfer_profile) : 'Profile' ?>">
+                    <span class="admin-seller-stock-value"><?= htmlspecialchars($prof) ?></span>
+                  </td>
+                  <td class="text-center" data-label="<?= isset($_seller_qty) ? htmlspecialchars($_seller_qty) : 'Qty' ?>">
+                    <span class="admin-seller-stock-value admin-seller-stock-qty"><?= $qty ?></span>
+                  </td>
+                </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <?php endforeach; ?>
     </div>
+    <?php else: ?>
+    <div class="admin-seller-stock-empty">
+      <i class="fa fa-info-circle"></i> <?= isset($_transfer_no_stock) ? $_transfer_no_stock : 'No unused tickets available.' ?>
+    </div>
+    <?php endif; ?>
 
     <!-- Formulaire transfert admin -->
     <?php if ($hasAny): ?>
@@ -1604,31 +1623,81 @@ if (isset($_POST['admin_send_accounting_notice'])) {
       </div>
     <?php endif; ?>
 
-    <div class="admin-accounting-cards">
-      <div class="admin-accounting-card" style="background:#eaf4fb;border-left:4px solid #2980b9;">
-        <div class="admin-accounting-card-label" style="color:#2980b9;"><i class="fa fa-calendar"></i> Période arrêtée</div>
-        <div class="admin-accounting-card-value" style="font-size:18px;color:#2980b9;"><?= htmlspecialchars($adminAccountingFrom) ?> <?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?> &rarr; <?= htmlspecialchars($adminAccountingTo) ?> <?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?></div>
-        <div style="font-size:12px;color:#1a6fa0;"><?= htmlspecialchars($adminAcctSellerLabel) ?></div>
+    <!-- Période + plage horaire -->
+    <div class="card dashboard-hotspot-card" style="margin-bottom:12px;">
+      <div class="card-body" style="padding:10px 12px 4px;">
+        <div class="row dashboard-hotspot-grid">
+
+          <div class="col-box-6">
+            <div class="box bg-blue bmh-75">
+              <a href="#">
+                <h1 class="acct-period-h1">
+                  <?= htmlspecialchars($adminAccountingFrom) ?>
+                  <span class="box-stat-unit"><?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?></span>
+                  &rarr;
+                  <?= htmlspecialchars($adminAccountingTo) ?>
+                  <span class="box-stat-unit"><?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?></span>
+                </h1>
+                <div><i class="fa fa-calendar"></i> Période arrêtée · <?= htmlspecialchars($adminAcctSellerLabel) ?></div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-box-6">
+            <div class="box bg-yellow bmh-75">
+              <a href="#">
+                <h1><?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?> &rarr; <?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?></h1>
+                <div><i class="fa fa-clock-o"></i> Plage horaire</div>
+              </a>
+            </div>
+          </div>
+
+        </div>
       </div>
-      <div class="admin-accounting-card" style="background:#f3e8fd;border-left:4px solid #8e44ad;">
-        <div class="admin-accounting-card-label" style="color:#8e44ad;"><i class="fa fa-ticket"></i> Tickets</div>
-        <div class="admin-accounting-card-value" style="color:#8e44ad;"><?= (int)$adminAcctTotal['count'] ?></div>
-      </div>
-      <div class="admin-accounting-card" style="background:#e8f8f5;border-left:4px solid #27ae60;">
-        <div class="admin-accounting-card-label" style="color:#27ae60;"><i class="fa fa-money"></i> Total encaissé</div>
-        <div class="admin-accounting-card-value" style="color:#27ae60;"><?= mikhmon_format_money_amount($adminAcctTotal['revenue'], $currency, $cekindo) ?></div>
-      </div>
-      <div class="admin-accounting-card" style="background:#fff8e1;border-left:4px solid #e67e22;">
-        <div class="admin-accounting-card-label" style="color:#e67e22;"><i class="fa fa-percent"></i> Commission vendeur (10%)</div>
-        <div class="admin-accounting-card-value" style="color:#e67e22;"><?= mikhmon_format_money_amount($adminAcctTotal['commission'], $currency, $cekindo) ?></div>
-      </div>
-      <div class="admin-accounting-card" style="background:#fdeef7;border-left:4px solid #c0398f;">
-        <div class="admin-accounting-card-label" style="color:#c0398f;"><i class="fa fa-bank"></i> Net à remettre</div>
-        <div class="admin-accounting-card-value" style="color:#c0398f;"><?= mikhmon_format_money_amount($adminAcctTotal['net'], $currency, $cekindo) ?></div>
-      </div>
-      <div class="admin-accounting-card" style="background:#eef2f7;border-left:4px solid #34495e;">
-        <div class="admin-accounting-card-label" style="color:#34495e;"><i class="fa fa-clock-o"></i> Plage horaire</div>
-        <div class="admin-accounting-card-value" style="color:#34495e;"><?= htmlspecialchars(substr($adminAccountingSettlementTime, 0, 5)) ?> &rarr; <?= htmlspecialchars(substr($adminAccountingNextSettlementTime, 0, 5)) ?></div>
+    </div>
+
+    <!-- Stats : tickets, encaissé, commission, net -->
+    <div class="card dashboard-hotspot-card" style="margin-bottom:14px;">
+      <div class="card-body" style="padding:10px 12px 4px;">
+        <div class="row dashboard-hotspot-grid">
+
+          <div class="col-3 col-box-6">
+            <div class="box bg-blue bmh-75">
+              <a href="#">
+                <h1><?= (int)$adminAcctTotal['count'] ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-ticket"></i> Tickets</div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-3 col-box-6">
+            <div class="box bg-green bmh-75">
+              <a href="#">
+                <h1><?= mikhmon_format_money_amount($adminAcctTotal['revenue'], $currency, $cekindo) ?></h1>
+                <div><i class="fa fa-money"></i> Total encaissé</div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-3 col-box-6">
+            <div class="box bg-yellow bmh-75">
+              <a href="#">
+                <h1><?= mikhmon_format_money_amount($adminAcctTotal['commission'], $currency, $cekindo) ?></h1>
+                <div><i class="fa fa-percent"></i> Commission vendeur</div>
+              </a>
+            </div>
+          </div>
+
+          <div class="col-3 col-box-6">
+            <div class="box bg-red bmh-75">
+              <a href="#">
+                <h1><?= mikhmon_format_money_amount($adminAcctTotal['net'], $currency, $cekindo) ?></h1>
+                <div><i class="fa fa-bank"></i> Net à remettre</div>
+              </a>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 

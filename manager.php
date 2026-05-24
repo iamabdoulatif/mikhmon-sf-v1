@@ -12,7 +12,7 @@ $url    = $_SERVER['REQUEST_URI'];
 $action = isset($_GET['action']) ? $_GET['action'] : 'dashboard';
 $idbl   = isset($_GET['idbl'])   ? $_GET['idbl']   : '';
 $idhr   = isset($_GET['idhr'])   ? $_GET['idhr']   : '';
-$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'logout');
+$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'vendors', 'logout');
 
 include_once('./lib/routeros_api.class.php');
 include_once('./lib/formatbytesbites.php');
@@ -928,39 +928,39 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
   <link rel="stylesheet" href="css/mikhmon-responsive.css">
   <link rel="stylesheet" href="css/mikhmon-portal.css">
 </head>
-<body class="manager-portal">
+<body class="<?= $manager_logged_in ? 'manager-portal' : 'auth-screen' ?>">
 <div class="wrapper">
 
 <?php if (!$manager_logged_in): ?>
 <!-- ══════════════════════════ PAGE DE CONNEXION ═══════════════════════════ -->
-<div class="portal-auth-wrap" style="max-width:400px;margin:72px auto 48px;padding:0 16px 48px;min-height:calc(100vh - 120px);">
-  <div class="card portal-auth-card portal-auth-card-sm" style="width:100%;max-width:400px;margin:0 auto;">
-    <div class="card-header">
-      <h3><i class="fa fa-briefcase"></i> <?= isset($_manager_login_title) ? $_manager_login_title : 'Manager Login' ?></h3>
+<div class="portal-auth-wrap" style="max-width:400px;margin:0 auto;padding:5% 0 32px;min-height:auto;">
+  <div class="login-card card portal-auth-card portal-auth-card-sm" style="width:100%;max-width:400px;margin:0 auto;">
+    <div class="card-header text-center">
+      <h3><?= isset($_please_login) ? $_please_login : 'Veuillez vous connecter' ?></h3>
     </div>
-    <div class="card-body portal-auth-body">
-      <div class="portal-auth-logo">
+    <div class="card-body login-card-body">
+      <div class="login-logo">
         <img src="img/favicon.png" alt="MIKHMON Logo">
-        <span class="portal-auth-logo-title">MIKHMON <small class="login-logo-subtitle">BY SafeLink Africa</small></span>
+        <span>MIKHMON <small class="login-logo-subtitle">BY SafeLink Africa</small></span>
         <div class="login-logo-contact">+2250709100552</div>
-        <span class="mgr-badge"><i class="fa fa-briefcase"></i> <?= isset($_manager) ? $_manager : 'Manager' ?></span>
       </div>
-      <form autocomplete="off" action="" method="post" class="portal-auth-form">
+      <div class="text-center login-role-row">
+        <span class="role-badge badge-manager">
+          <i class="fa fa-briefcase"></i> <?= isset($_manager) ? $_manager : 'Gérant' ?>
+        </span>
+      </div>
+      <form autocomplete="off" action="" method="post">
         <?= csrf_field() ?>
-        <div class="portal-auth-field">
-          <input class="form-control portal-auth-input" type="text" name="manager_user"
-                 placeholder="<?= isset($_seller_id) ? $_seller_id : 'Identifier' ?>" required autofocus>
-        </div>
-        <div class="portal-auth-field">
-          <input class="form-control portal-auth-input" type="password" name="manager_pass"
-                 placeholder="Password" required>
-        </div>
-        <input type="submit" name="manager_login" class="btn-login bg-primary portal-auth-submit"
-               value="<?= isset($_manager_login_title) ? $_manager_login_title : 'Manager Login' ?>">
+        <input class="login-field form-control" type="text" name="manager_user"
+               placeholder="<?= isset($_seller_id) ? $_seller_id : 'Identifiant' ?>" required autofocus>
+        <input class="login-field form-control" type="password" name="manager_pass"
+               placeholder="<?= isset($_password) ? $_password : 'Mot de passe' ?>" required>
+        <input class="login-submit btn-manager" type="submit" name="manager_login"
+               value="<?= isset($_manager_login_title) ? $_manager_login_title : 'Connexion gérant' ?>">
+        <?= $login_error ?>
       </form>
-      <?= $login_error ?>
       <div class="portal-auth-footer-link">
-        <a href="./admin.php?id=login">← <?= isset($_please_login) ? $_please_login : 'Login' ?></a>
+        <a href="./admin.php?id=login">← <?= isset($_please_login) ? $_please_login : 'Connexion' ?></a>
       </div>
     </div>
     <div class="card-footer login-footer">
@@ -1023,6 +1023,11 @@ if ($manager_logged_in && $action === 'accounting' && isset($_POST['send_account
     <i class="fa fa-ticket"></i> Générer &amp; imprimer
   </a>
 
+  <a href="./manager.php?action=vendors"
+     class="menu<?= ($action==='vendors') ? ' active' : '' ?>">
+    <i class="fa fa-users"></i> Vendeurs
+  </a>
+
   <a href="./manager.php?action=logout" class="menu">
     <i class="fa fa-sign-out"></i> <?= isset($_logout) ? $_logout : 'Logout' ?>
   </a>
@@ -1081,61 +1086,116 @@ if (in_array($action, ['overview','accounting'])) {
 </div></div>
 <?php elseif ($action === 'dashboard'): ?>
 <!-- ══════════════════════════ ACCUEIL GÉRANT ═════════════════════════════ -->
-<div class="row"><div class="col-12">
-<div class="card" style="margin-bottom:14px;">
-  <div class="card-header">
-    <h3 style="margin:0;"><i class="fa fa-briefcase"></i> Accueil gérant</h3>
-  </div>
-  <div class="card-body">
-    <div style="background:#f8f1ff;color:#4a235a;padding:12px 14px;margin-bottom:14px;border-left:4px solid #8e44ad;border-radius:4px;">
-      <b><i class="fa fa-info-circle"></i> Rôle du gérant</b><br>
-      Le gérant consulte uniquement l’activité utile à la production : connectés en cours, profils disponibles et tickets à générer ou imprimer.
-      Il n’accède pas au tableau de bord technique admin.
-    </div>
 
-    <div class="mgr-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
-      <div style="flex:1;min-width:170px;background:#eaf4fb;border-radius:8px;padding:14px 16px;border-left:4px solid #2980b9;">
-        <div style="font-size:11px;color:#2980b9;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-wifi"></i> Connectés maintenant</div>
-        <div style="font-size:24px;font-weight:bold;color:#2980b9;"><?= (int)$managerConnectedCount ?></div>
-        <div style="font-size:12px;color:#1a6fa0;">utilisateurs actifs sur le hotspot</div>
+<!-- ROW 1 — Hotspot -->
+<div class="row manager-dashboard-row manager-dashboard-hotspot-row">
+  <div class="col-12">
+    <div class="card mgr-dash-card" style="margin-bottom:14px;">
+      <div class="card-header"><h3><i class="fa fa-wifi"></i> Hotspot</h3></div>
+      <div class="card-body">
+        <div class="row dashboard-hotspot-grid manager-dashboard-grid">
+          <div class="col-3 col-box-6">
+            <div class="box bg-blue bmh-75">
+              <a href="<?= $managerHomeUrl ?>">
+                <h1><?= (int)$managerConnectedCount ?><span class="box-stat-unit"> utilisateurs</span></h1>
+                <div><i class="fa fa-wifi"></i> Connectés maintenant</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-green bmh-75">
+              <a href="<?= $managerOverviewUrl ?>">
+                <h1><?= (int)$managerStockTotal ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-archive"></i> Stock disponible</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-yellow bmh-75">
+              <a href="<?= $managerOverviewUrl ?>">
+                <h1><?= (int)$managerTodayTickets ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-ticket"></i> Tickets aujourd’hui</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-red bmh-75">
+              <a href="<?= $managerAccountingUrl ?>">
+                <h1><?= (int)$managerMonthTickets ?><span class="box-stat-unit"> vcr</span></h1>
+                <div><i class="fa fa-print"></i> Tickets du mois</div>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style="flex:1;min-width:170px;background:#fdf2e9;border-radius:8px;padding:14px 16px;border-left:4px solid #d35400;">
-        <div style="font-size:11px;color:#d35400;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-ticket"></i> Tickets générés aujourd'hui</div>
-        <div style="font-size:24px;font-weight:bold;color:#d35400;"><?= $managerTodayTickets ?> <small style="font-size:13px;">vcr</small></div>
-        <div style="font-size:12px;color:#a04000;">volume de tickets uniquement</div>
-      </div>
-      <div style="flex:1;min-width:170px;background:#e8f8f5;border-radius:8px;padding:14px 16px;border-left:4px solid #27ae60;">
-        <div style="font-size:11px;color:#27ae60;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-archive"></i> Stock total</div>
-        <div style="font-size:24px;font-weight:bold;color:#27ae60;"><?= $managerStockTotal ?></div>
-        <div style="font-size:12px;color:#1e7e34;">tickets non utilisés chez les vendeurs</div>
-      </div>
-      <div style="flex:1;min-width:170px;background:#f3e8fd;border-radius:8px;padding:14px 16px;border-left:4px solid #8e44ad;">
-        <div style="font-size:11px;color:#8e44ad;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-print"></i> Tickets du mois</div>
-        <div style="font-size:24px;font-weight:bold;color:#8e44ad;"><?= $managerMonthTickets ?> <small style="font-size:13px;">vcr</small></div>
-        <div style="font-size:12px;color:#6c3483;">volume généré/imprimable</div>
-      </div>
-    </div>
-
-    <div class="mgr-action-grid">
-      <a href="<?= $managerOverviewUrl ?>" class="mgr-action-card" style="background:#4aa3d6;">
-        <i class="fa fa-line-chart"></i> Ventes des vendeurs
-      </a>
-      <a href="<?= $managerAccountingUrl ?>" class="mgr-action-card" style="background:#8e44ad;">
-        <i class="fa fa-calculator"></i> Compte vendeur
-      </a>
-      <a href="./manager.php?action=tickets" class="mgr-action-card" style="background:#163c63;">
-        <i class="fa fa-ticket"></i> Générer &amp; imprimer
-      </a>
     </div>
   </div>
 </div>
 
-</div></div>
+<!-- ROW 2 — Gestion vendeurs -->
+<div class="row manager-dashboard-row manager-dashboard-vendor-row">
+  <div class="col-12">
+    <div class="card mgr-dash-card" style="margin-bottom:14px;">
+      <div class="card-header"><h3><i class="fa fa-users"></i> Gestion vendeurs</h3></div>
+      <div class="card-body">
+        <div class="row dashboard-hotspot-grid manager-dashboard-grid">
+          <div class="col-3 col-box-6">
+            <div class="box bg-blue bmh-75">
+              <a href="<?= $managerHomeUrl ?>">
+                <h1><i class="fa fa-home"></i></h1>
+                <div>Accueil gérant</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-green bmh-75">
+              <a href="<?= $managerOverviewUrl ?>">
+                <h1><i class="fa fa-line-chart"></i></h1>
+                <div>Ventes des vendeurs</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-yellow bmh-75">
+              <a href="<?= $managerAccountingUrl ?>">
+                <h1><i class="fa fa-calculator"></i></h1>
+                <div>Compte vendeur</div>
+              </a>
+            </div>
+          </div>
+          <div class="col-3 col-box-6">
+            <div class="box bg-red bmh-75">
+              <a href="./manager.php?action=tickets">
+                <h1><i class="fa fa-ticket"></i></h1>
+                <div>Générer &amp; imprimer</div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ROW 3 — Rôle du gérant -->
+<div class="row manager-dashboard-row manager-dashboard-role-row">
+  <div class="col-12">
+    <div class="card" style="margin-bottom:14px;">
+      <div class="card-header"><h3><i class="fa fa-info-circle"></i> Rôle du gérant</h3></div>
+      <div class="card-body">
+        <p style="margin:0;color:#dbe4ee;font-size:13.5px;line-height:1.6;">
+          Le gérant consulte uniquement l’activité utile à la production : connectés en cours, profils disponibles et tickets à générer ou imprimer.
+          Il n’accède pas au tableau de bord technique admin.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <?php elseif ($action === 'overview'): ?>
 <!-- ══════════════════════ VUE D'ENSEMBLE PAR PROFIL ══════════════════════ -->
-<div class="row"><div class="col-12">
-<div class="card">
+<div class="row manager-overview-shell"><div class="col-12">
+<div class="card manager-overview-page-card">
   <div class="card-header" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
     <h3 style="margin:0;"><i class="fa fa-bar-chart"></i>
       <?= isset($_manager_overview) ? $_manager_overview : 'Vendors Overview' ?>
@@ -1153,9 +1213,11 @@ if (in_array($action, ['overview','accounting'])) {
     </small>
   </div>
   <div class="card-body">
+  <div class="container-fluid manager-overview-container">
 
     <!-- Filtre mois -->
-    <div style="margin-bottom:18px;">
+    <div class="row manager-overview-row manager-overview-filter-row" style="margin-bottom:18px;">
+      <div class="col-12">
       <div class="mgr-month-filter">
         <?php
           $curY = date("Y");
@@ -1166,6 +1228,7 @@ if (in_array($action, ['overview','accounting'])) {
               echo '<a href="./manager.php?action=overview&idbl=' . $tag . '" class="btn btn-sm ' . $active . '" style="padding:4px 10px;">' . $ms . '</a>';
           }
         ?>
+      </div>
       </div>
     </div>
 
@@ -1192,22 +1255,29 @@ if (in_array($action, ['overview','accounting'])) {
           // stock déjà comptabilisé via profileStats
       }
     ?>
-    <div class="mgr-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;">
-      <div style="flex:1;min-width:150px;background:#f3e8fd;border-radius:8px;padding:12px 16px;border-left:4px solid #8e44ad;">
+    <div class="row mgr-summary-cards manager-overview-row manager-overview-summary-row manager-overview-grid" style="margin-bottom:20px;">
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-blue" style="background:#f3e8fd;border-radius:8px;padding:12px 16px;border-left:4px solid #8e44ad;">
         <div style="font-size:11px;color:#8e44ad;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-sun-o"></i> Aujourd'hui</div>
         <div style="font-size:22px;font-weight:bold;color:#8e44ad;"><?= $gtAllToday ?> <small style="font-size:13px;">vcr</small></div>
         <div style="font-size:13px;color:#6c3483;"><?= mikhmon_format_money_amount($gtAllRevToday, $currency, $cekindo) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#eaf4fb;border-radius:8px;padding:12px 16px;border-left:4px solid #2980b9;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-green" style="background:#eaf4fb;border-radius:8px;padding:12px 16px;border-left:4px solid #2980b9;">
         <div style="font-size:11px;color:#2980b9;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-calendar"></i> Ce mois</div>
         <div style="font-size:22px;font-weight:bold;color:#2980b9;"><?= $gtAllMonth ?> <small style="font-size:13px;">vcr</small></div>
         <div style="font-size:13px;color:#1a6fa0;"><?= mikhmon_format_money_amount($gtAllRevMonth, $currency, $cekindo) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#e8f8f5;border-radius:8px;padding:12px 16px;border-left:4px solid #27ae60;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-yellow" style="background:#e8f8f5;border-radius:8px;padding:12px 16px;border-left:4px solid #27ae60;">
         <div style="font-size:11px;color:#27ae60;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-archive"></i> Stock total</div>
         <div style="font-size:22px;font-weight:bold;color:#27ae60;"><?= array_sum(array_map('array_sum', $allSellerStock)) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#fff8e1;border-radius:8px;padding:12px 16px;border-left:4px solid #e67e22;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-red" style="background:#fff8e1;border-radius:8px;padding:12px 16px;border-left:4px solid #e67e22;">
         <div style="font-size:11px;color:#e67e22;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-percent"></i> Commissions</div>
         <?php
           $gtComm = 0.0;
@@ -1219,6 +1289,7 @@ if (in_array($action, ['overview','accounting'])) {
         ?>
         <div style="font-size:22px;font-weight:bold;color:#e67e22;"><?= mikhmon_format_money_amount($gtComm, $currency, $cekindo) ?></div>
       </div>
+      </div>
     </div>
 
     <!-- ── Cartes par profil ── -->
@@ -1227,9 +1298,11 @@ if (in_array($action, ['overview','accounting'])) {
       $profStock = array_sum(array_column($ps['vendors'], 'stock'));
       $unitPrice = $ps['price'];
     ?>
-    <div class="mgr-light-profile-card">
+    <div class="row manager-overview-row manager-overview-profile-row">
+    <div class="col-12">
+    <div class="mgr-light-profile-card manager-overview-profile-card">
       <!-- En-tête profil -->
-      <div class="prof-card-header" style="background:linear-gradient(90deg,#f3e8fd,#fafafa);padding:12px 18px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <div class="prof-card-header manager-overview-profile-header" style="background:linear-gradient(90deg,#f3e8fd,#fafafa);padding:12px 18px;border-bottom:1px solid #e0e0e0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <div>
           <span style="font-size:17px;font-weight:bold;color:#5b2c8d;">
             <i class="fa fa-tag" style="color:#8e44ad;margin-right:6px;"></i><?= htmlspecialchars($profName) ?>
@@ -1240,23 +1313,26 @@ if (in_array($action, ['overview','accounting'])) {
           </span>
           <?php endif; ?>
         </div>
-        <div class="prof-card-stats" style="display:flex;gap:14px;font-size:13px;">
-          <span style="color:#c0392b;font-weight:bold;">
+        <div class="prof-card-stats manager-overview-profile-stats" style="display:flex;gap:14px;font-size:13px;">
+          <span class="manager-overview-stat bg-blue" style="color:#c0392b;font-weight:bold;">
             <i class="fa fa-sun-o"></i> <?= $ps['today'] ?> vcr
             <small class="mgr-soft-note" style="font-weight:normal;">/ <?= mikhmon_format_money_amount($ps['rev_today'], $currency, $cekindo) ?></small>
           </span>
-          <span style="color:#2980b9;font-weight:bold;">
+          <span class="manager-overview-stat bg-green" style="color:#2980b9;font-weight:bold;">
             <i class="fa fa-calendar"></i> <?= $ps['total'] ?> vcr
             <small class="mgr-soft-note" style="font-weight:normal;">/ <?= mikhmon_format_money_amount($ps['rev_total'], $currency, $cekindo) ?></small>
           </span>
-          <span style="color:#27ae60;font-weight:bold;">
+          <span class="manager-overview-stat bg-yellow" style="color:#27ae60;font-weight:bold;">
             <i class="fa fa-archive"></i> <?= $profStock ?> stock
+          </span>
+          <span class="manager-overview-stat bg-red" style="color:#c0392b;font-weight:bold;">
+            <i class="fa fa-money"></i> <?= $unitPrice > 0 ? mikhmon_format_money_amount($unitPrice, $currency, $cekindo) . ' / vcr' : 'Prix non défini' ?>
           </span>
         </div>
       </div>
       <!-- Tableau vendeurs pour ce profil -->
-      <div style="overflow-x:auto;">
-        <table class="table table-bordered portal-table-min-lg">
+      <div class="manager-overview-table-wrap" style="overflow-x:auto;">
+        <table class="table table-bordered portal-table-min-lg manager-overview-table">
           <thead class="thead-light">
             <tr>
               <th><?= isset($_seller) ? $_seller : 'Vendeur' ?></th>
@@ -1270,36 +1346,48 @@ if (in_array($action, ['overview','accounting'])) {
           <tbody>
             <?php foreach ($ps['vendors'] as $vk => $vd): ?>
             <tr>
-              <td>
+              <td data-label="<?= isset($_seller) ? $_seller : 'Vendeur' ?>">
+                <span class="manager-overview-cell-value">
                 <b><?= htmlspecialchars($vd['name']) ?></b>
                 <small class="mgr-soft-note" style="margin-left:4px;"><code><?= htmlspecialchars($vk) ?></code></small>
+                </span>
               </td>
-              <td class="text-center">
+              <td class="text-center" data-label="<?= isset($_today) ? $_today : 'Aujourd\'hui' ?>">
+                <span class="manager-overview-cell-value">
                 <?php if ($vd['today'] > 0): ?>
                   <span style="background:#fde8e8;color:#c0392b;border-radius:10px;padding:1px 8px;font-weight:bold;"><?= $vd['today'] ?></span>
                 <?php else: ?>
                   <span style="color:#ccc;">—</span>
                 <?php endif; ?>
+                </span>
               </td>
-              <td class="text-center" style="color:#c0392b;">
+              <td class="text-center" data-label="CA <?= isset($_today) ? $_today : 'Auj.' ?>" style="color:#c0392b;">
+                <span class="manager-overview-cell-value">
                 <?= $vd['today'] > 0 ? mikhmon_format_money_amount($vd['today'] * $vd['price'], $currency, $cekindo) : '<span style="color:#ccc;">—</span>' ?>
+                </span>
               </td>
-              <td class="text-center">
+              <td class="text-center" data-label="<?= isset($_this_month) ? $_this_month : 'Ce mois-ci' ?>">
+                <span class="manager-overview-cell-value">
                 <?php if ($vd['total'] > 0): ?>
                   <span style="background:#e8f0fe;color:#2980b9;border-radius:10px;padding:1px 8px;font-weight:bold;"><?= $vd['total'] ?></span>
                 <?php else: ?>
                   <span style="color:#ccc;">—</span>
                 <?php endif; ?>
+                </span>
               </td>
-              <td class="text-center" style="color:#2980b9;">
+              <td class="text-center" data-label="CA mois" style="color:#2980b9;">
+                <span class="manager-overview-cell-value">
                 <?= $vd['total'] > 0 ? mikhmon_format_money_amount($vd['total'] * $vd['price'], $currency, $cekindo) : '<span style="color:#ccc;">—</span>' ?>
+                </span>
               </td>
-              <td class="text-center">
+              <td class="text-center" data-label="Stock">
+                <span class="manager-overview-cell-value">
                 <?php if ($vd['stock'] > 0): ?>
                   <span style="background:#e8f8f5;color:#27ae60;border-radius:10px;padding:1px 8px;font-weight:bold;"><?= $vd['stock'] ?></span>
                 <?php else: ?>
                   <span style="color:#ccc;">0</span>
                 <?php endif; ?>
+                </span>
               </td>
             </tr>
             <?php endforeach; ?>
@@ -1312,29 +1400,32 @@ if (in_array($action, ['overview','accounting'])) {
           ?>
           <tfoot>
             <tr class="mgr-profile-total-row">
-              <td><i class="fa fa-sigma"></i> TOTAL</td>
-              <td class="text-center"><?= $profTotToday ?></td>
-              <td class="text-center"><?= mikhmon_format_money_amount($profTotToday * $unitPrice, $currency, $cekindo) ?></td>
-              <td class="text-center"><?= $profTotMonth ?></td>
-              <td class="text-center"><?= mikhmon_format_money_amount($profTotMonth * $unitPrice, $currency, $cekindo) ?></td>
-              <td class="text-center"><?= $profTotStock ?></td>
+              <td data-label="Total"><span class="manager-overview-cell-value"><i class="fa fa-sigma"></i> TOTAL</span></td>
+              <td class="text-center" data-label="<?= isset($_today) ? $_today : 'Aujourd\'hui' ?>"><span class="manager-overview-cell-value"><?= $profTotToday ?></span></td>
+              <td class="text-center" data-label="CA <?= isset($_today) ? $_today : 'Auj.' ?>"><span class="manager-overview-cell-value"><?= mikhmon_format_money_amount($profTotToday * $unitPrice, $currency, $cekindo) ?></span></td>
+              <td class="text-center" data-label="<?= isset($_this_month) ? $_this_month : 'Ce mois-ci' ?>"><span class="manager-overview-cell-value"><?= $profTotMonth ?></span></td>
+              <td class="text-center" data-label="CA mois"><span class="manager-overview-cell-value"><?= mikhmon_format_money_amount($profTotMonth * $unitPrice, $currency, $cekindo) ?></span></td>
+              <td class="text-center" data-label="Stock"><span class="manager-overview-cell-value"><?= $profTotStock ?></span></td>
             </tr>
           </tfoot>
         </table>
       </div>
+    </div>
+    </div>
     </div>
     <?php endforeach; ?>
 
     <?php endif; ?>
 
   </div>
+  </div>
 </div>
 </div></div>
 
 <?php elseif ($action === 'accounting'): ?>
 <!-- ══════════════════════════ COMPTABILITÉ ════════════════════════════════ -->
-<div class="row"><div class="col-12">
-<div class="card">
+<div class="row manager-accounting-shell"><div class="col-12">
+<div class="card manager-accounting-page-card">
   <div class="card-header">
     <h3><i class="fa fa-calculator"></i>
       Compte vendeur
@@ -1348,9 +1439,11 @@ if (in_array($action, ['overview','accounting'])) {
     </h3>
   </div>
   <div class="card-body">
+  <div class="container-fluid manager-accounting-container">
 
     <!-- Filtre mois -->
-    <div style="margin-bottom:16px;">
+    <div class="row manager-accounting-row manager-accounting-filter-row" style="margin-bottom:16px;">
+      <div class="col-12">
       <div class="mgr-month-filter">
         <?php
           for ($mi = 1; $mi <= 12; $mi++) {
@@ -1360,6 +1453,7 @@ if (in_array($action, ['overview','accounting'])) {
               echo '<a href="./manager.php?action=accounting&idbl=' . $tag . '" class="btn btn-sm ' . $active . '" style="padding:4px 10px;">' . $ms . '</a>';
           }
         ?>
+      </div>
       </div>
     </div>
 
@@ -1371,16 +1465,16 @@ if (in_array($action, ['overview','accounting'])) {
     <form method="get" action="./manager.php" class="portal-card-section mgr-accounting-shell" style="margin-bottom:18px;">
       <input type="hidden" name="action" value="accounting">
       <input type="hidden" name="idbl" value="<?= htmlspecialchars($accountingMonthKey) ?>">
-      <div class="portal-filter-grid mgr-accounting-form">
-        <div class="portal-filter-item">
+      <div class="row mgr-accounting-form manager-accounting-row manager-accounting-form-row">
+        <div class="portal-filter-item col-4 col-box-12 manager-bootstrap-col">
           <label class="transfer-label"><i class="fa fa-calendar-o"></i> Début</label>
           <input type="date" name="from" class="form-control" value="<?= htmlspecialchars($accountingFrom) ?>">
         </div>
-        <div class="portal-filter-item">
+        <div class="portal-filter-item col-4 col-box-12 manager-bootstrap-col">
           <label class="transfer-label"><i class="fa fa-calendar-check-o"></i> Arrêt</label>
           <input type="date" name="to" class="form-control" value="<?= htmlspecialchars($accountingTo) ?>">
         </div>
-        <div class="portal-filter-item">
+        <div class="portal-filter-item col-4 col-box-12 manager-bootstrap-col">
           <label class="transfer-label"><i class="fa fa-user"></i> Vendeur à compter</label>
           <select name="seller" class="form-control" required>
             <option value="">Choisir un vendeur</option>
@@ -1391,11 +1485,11 @@ if (in_array($action, ['overview','accounting'])) {
             <?php endforeach; ?>
           </select>
         </div>
-        <div class="portal-filter-item">
+        <div class="portal-filter-item col-6 col-box-12 manager-bootstrap-col">
           <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure début</label>
           <input type="time" name="settled_at" class="form-control" step="60" value="<?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?>">
         </div>
-        <div class="portal-filter-item">
+        <div class="portal-filter-item col-6 col-box-12 manager-bootstrap-col">
           <label class="transfer-label"><i class="fa fa-clock-o"></i> Heure fin</label>
           <input type="time" name="next_settled_at" class="form-control" step="60" value="<?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?>">
         </div>
@@ -1418,42 +1512,58 @@ if (in_array($action, ['overview','accounting'])) {
       $accountingExpensesDeducted = ($accountingSeller === '');
       $acctNetAfterExpenses = $accountingExpensesDeducted ? mikhmon_accounting_net_after_expenses($acctTotal, $accountingPeriodExpenses) : $acctTotal['net'];
     ?>
-    <div class="mgr-summary-cards" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
-      <div style="flex:1;min-width:170px;background:#eaf4fb;border-radius:8px;padding:14px 16px;border-left:4px solid #2980b9;">
+    <div class="row mgr-summary-cards manager-accounting-row manager-accounting-summary-row manager-accounting-grid" style="margin-bottom:18px;">
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-blue" style="background:#eaf4fb;border-radius:8px;padding:14px 16px;border-left:4px solid #2980b9;">
         <div style="font-size:11px;color:#2980b9;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-calendar"></i> Période arrêtée</div>
         <div style="font-size:18px;font-weight:bold;color:#2980b9;"><?= htmlspecialchars($accountingFrom) ?> <?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?> → <?= htmlspecialchars($accountingTo) ?> <?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?></div>
         <div style="font-size:12px;color:#1a6fa0;"><?= htmlspecialchars($acctSellerLabel) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#f3e8fd;border-radius:8px;padding:14px 16px;border-left:4px solid #8e44ad;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-green" style="background:#f3e8fd;border-radius:8px;padding:14px 16px;border-left:4px solid #8e44ad;">
         <div style="font-size:11px;color:#8e44ad;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-ticket"></i> Tickets</div>
         <div style="font-size:24px;font-weight:bold;color:#8e44ad;"><?= $acctTotal['count'] ?> <small style="font-size:13px;">vcr</small></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#e8f8f5;border-radius:8px;padding:14px 16px;border-left:4px solid #27ae60;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-yellow" style="background:#e8f8f5;border-radius:8px;padding:14px 16px;border-left:4px solid #27ae60;">
         <div style="font-size:11px;color:#27ae60;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-money"></i> Total encaissé</div>
         <div style="font-size:22px;font-weight:bold;color:#27ae60;"><?= mikhmon_format_money_amount($acctTotal['revenue'], $currency, $cekindo) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#fff8e1;border-radius:8px;padding:14px 16px;border-left:4px solid #e67e22;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-red" style="background:#fff8e1;border-radius:8px;padding:14px 16px;border-left:4px solid #e67e22;">
         <div style="font-size:11px;color:#e67e22;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-percent"></i> Commission vendeur (10%)</div>
         <div style="font-size:22px;font-weight:bold;color:#e67e22;"><?= mikhmon_format_money_amount($acctTotal['commission'], $currency, $cekindo) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#fdeef7;border-radius:8px;padding:14px 16px;border-left:4px solid #c0398f;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-blue" style="background:#fdeef7;border-radius:8px;padding:14px 16px;border-left:4px solid #c0398f;">
         <div style="font-size:11px;color:#c0398f;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-bank"></i> Net à remettre</div>
         <div style="font-size:22px;font-weight:bold;color:#c0398f;"><?= mikhmon_format_money_amount($acctTotal['net'], $currency, $cekindo) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#fff1f0;border-radius:8px;padding:14px 16px;border-left:4px solid #c0392b;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-green" style="background:#fff1f0;border-radius:8px;padding:14px 16px;border-left:4px solid #c0392b;">
         <div style="font-size:11px;color:#c0392b;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-minus-circle"></i> Dépenses</div>
         <div style="font-size:22px;font-weight:bold;color:#c0392b;"><?= mikhmon_format_money_amount($accountingExpensesTotal, $currency, $cekindo) ?></div>
       </div>
-      <div style="flex:1;min-width:150px;background:#ecfdf3;border-radius:8px;padding:14px 16px;border-left:4px solid #15803d;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-yellow" style="background:#ecfdf3;border-radius:8px;padding:14px 16px;border-left:4px solid #15803d;">
         <div style="font-size:11px;color:#15803d;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-calculator"></i> Net après dépenses</div>
         <div style="font-size:22px;font-weight:bold;color:#15803d;"><?= mikhmon_format_money_amount($acctNetAfterExpenses, $currency, $cekindo) ?></div>
         <?php if (!$accountingExpensesDeducted): ?>
           <div style="font-size:11px;color:#64748b;">Non déduit du vendeur sélectionné</div>
         <?php endif; ?>
       </div>
-      <div style="flex:1;min-width:150px;background:#eef2f7;border-radius:8px;padding:14px 16px;border-left:4px solid #34495e;">
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col">
+      <div class="manager-color-card bg-red" style="background:#eef2f7;border-radius:8px;padding:14px 16px;border-left:4px solid #34495e;">
         <div style="font-size:11px;color:#34495e;font-weight:bold;text-transform:uppercase;letter-spacing:.5px;"><i class="fa fa-clock-o"></i> Plage horaire</div>
         <div style="font-size:22px;font-weight:bold;color:#34495e;"><?= htmlspecialchars(substr($accountingSettlementTime, 0, 5)) ?> → <?= htmlspecialchars(substr($accountingNextSettlementTime, 0, 5)) ?></div>
+      </div>
       </div>
     </div>
 
@@ -1623,8 +1733,9 @@ if (in_array($action, ['overview','accounting'])) {
                 <td class="text-center accounting-time-cell" data-label="Heure du compte"><span class="accounting-settlement-chip"><i class="fa fa-clock-o"></i> <?= htmlspecialchars($accountingSettlementTime) ?></span></td>
                 <td data-label="Profils vendus">
                   <?php foreach ($sellerRow['profiles'] as $profileName => $profileTotal): ?>
-                    <span style="display:inline-block;margin:2px 4px 2px 0;padding:2px 8px;border-radius:12px;background:#eef2f7;color:#243447;font-size:12px;">
-                      <?= htmlspecialchars($profileName) ?>: <?= (int)$profileTotal['count'] ?>
+                    <span class="acct-profile-badge">
+                      <span class="acct-profile-name"><?= htmlspecialchars($profileName) ?></span>
+                      <span class="acct-profile-count"><?= (int)$profileTotal['count'] ?></span>
                     </span>
                   <?php endforeach; ?>
                 </td>
@@ -1652,6 +1763,7 @@ if (in_array($action, ['overview','accounting'])) {
       <?php endforeach; ?>
     <?php endif; ?>
 
+  </div>
   </div>
 </div>
 </div></div>
@@ -1888,17 +2000,51 @@ if (in_array($action, ['overview','accounting'])) {
 
 <?php elseif ($action === 'vendors'): ?>
 <!-- ══════════════════════════ GESTION VENDEURS ════════════════════════════ -->
-<div class="row"><div class="col-12">
-<div class="card">
+<div class="row manager-vendors-shell"><div class="col-12">
+<div class="card manager-vendors-row manager-vendors-page-card">
   <div class="card-header">
     <h3><i class="fa fa-users"></i> <?= isset($_manager_my_vendors) ? $_manager_my_vendors : 'My Vendors' ?></h3>
   </div>
   <div class="card-body">
+  <div class="container-fluid manager-vendors-container">
 
     <?= $msg_vendors ?>
 
+    <div class="row mgr-summary-cards manager-vendors-row manager-vendors-summary-row manager-vendors-grid" style="margin-bottom:18px;">
+      <div class="col-3 col-box-6 manager-bootstrap-col manager-vendors-summary-col">
+      <div class="manager-color-card bg-blue" style="border-radius:8px;padding:14px 16px;">
+        <div><i class="fa fa-users"></i> Vendeurs</div>
+        <div><?= count($managerSellersData) ?></div>
+        <div>comptes liés au gérant</div>
+      </div>
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col manager-vendors-summary-col">
+      <div class="manager-color-card bg-green" style="border-radius:8px;padding:14px 16px;">
+        <div><i class="fa fa-server"></i> Session</div>
+        <div><?= htmlspecialchars($manager_session_name) ?></div>
+        <div>routeur assigné</div>
+      </div>
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col manager-vendors-summary-col">
+      <div class="manager-color-card bg-yellow" style="border-radius:8px;padding:14px 16px;">
+        <div><i class="fa fa-archive"></i> Stock vendeurs</div>
+        <div><?= array_sum(array_map('array_sum', $allSellerStock)) ?></div>
+        <div>tickets non utilisés</div>
+      </div>
+      </div>
+      <div class="col-3 col-box-6 manager-bootstrap-col manager-vendors-summary-col">
+      <div class="manager-color-card bg-red" style="border-radius:8px;padding:14px 16px;">
+        <div><i class="fa fa-plus"></i> Ajout</div>
+        <div>Actif</div>
+        <div>création encadrée</div>
+      </div>
+      </div>
+    </div>
+
     <!-- Liste -->
-    <div class="card box-bordered" style="margin-bottom:15px;">
+    <div class="row manager-vendors-row manager-vendors-list-row">
+    <div class="col-12">
+    <div class="card box-bordered manager-vendors-list-card" style="margin-bottom:15px;">
       <div class="card-header"><h4><i class="fa fa-list"></i> <?= isset($_registered_sellers) ? $_registered_sellers : 'Registered Vendors' ?></h4></div>
       <div class="card-body">
         <?php if (empty($managerSellersData)): ?>
@@ -1961,26 +2107,30 @@ if (in_array($action, ['overview','accounting'])) {
         <?php endif; ?>
       </div>
     </div>
+    </div>
+    </div>
 
     <!-- Ajouter vendeur -->
-    <div class="card box-bordered">
+    <div class="row manager-vendors-row manager-vendors-form-row">
+    <div class="col-12">
+    <div class="card box-bordered manager-vendors-form-card">
       <div class="card-header"><h4><i class="fa fa-user-plus"></i> <?= isset($_add_seller) ? $_add_seller : 'Add Vendor' ?></h4></div>
       <div class="card-body">
         <form autocomplete="off" method="post" action="./manager.php?action=vendors">
-          <div class="admin-transfer-grid">
-            <div class="admin-transfer-group">
+          <div class="row manager-vendors-row manager-vendors-form-grid">
+            <div class="admin-transfer-group col-6 col-box-12 manager-bootstrap-col">
               <label class="transfer-label"><?= isset($_seller_id) ? $_seller_id : 'Identifier' ?> <small>(a-z,0-9,_)</small></label>
               <input class="form-control" type="text" name="new_user" pattern="[a-zA-Z0-9_]+" placeholder="ex: korotoum" required>
             </div>
-            <div class="admin-transfer-group">
+            <div class="admin-transfer-group col-6 col-box-12 manager-bootstrap-col">
               <label class="transfer-label"><?= isset($_password) ? $_password : 'Password' ?></label>
               <input class="form-control" type="password" name="new_pass" placeholder="Password" required>
             </div>
-            <div class="admin-transfer-group">
+            <div class="admin-transfer-group col-6 col-box-12 manager-bootstrap-col">
               <label class="transfer-label"><?= isset($_seller_display_name) ? $_seller_display_name : 'Display Name' ?></label>
               <input class="form-control" type="text" name="new_name" placeholder="ex: Korotoum Market" required>
             </div>
-            <div class="admin-transfer-group">
+            <div class="admin-transfer-group col-6 col-box-12 manager-bootstrap-col">
               <label class="transfer-label"><?= isset($_seller_session_router) ? $_seller_session_router : 'Session' ?></label>
               <input type="hidden" name="new_session" value="<?= htmlspecialchars($manager_session_name) ?>">
               <div class="portal-note-card" style="padding:12px 14px;text-align:left;">
@@ -1996,7 +2146,10 @@ if (in_array($action, ['overview','accounting'])) {
         </form>
       </div>
     </div>
+    </div>
+    </div>
 
+  </div>
   </div>
 </div>
 </div></div>
@@ -2060,7 +2213,7 @@ if (in_array($action, ['overview','accounting'])) {
 
 <?php elseif ($action === 'tickets'): ?>
 <!-- ═════════════════════════════════════ PAGE TICKETS GÉRANT ═════════════════════ -->
-<div class="row"><div class="col-12">
+<div class="row manager-tickets-shell"><div class="col-12">
 <?php
   $hotspotProfiles = array();
   $ticketServers = array();
@@ -2096,11 +2249,12 @@ if (in_array($action, ['overview','accounting'])) {
   $managerGlobalStockCount = array_sum($globalStock);
 ?>
 
-<div class="card">
+<div class="card manager-tickets-row manager-tickets-production-row">
   <div class="card-header">
     <h3><i class="fa fa-ticket"></i> Générer &amp; imprimer des tickets</h3>
   </div>
   <div class="card-body">
+  <div class="container-fluid manager-tickets-container">
     <div class="portal-admin-shell">
       <div class="portal-toolbar">
         <div class="portal-toolbar-group">
@@ -2130,8 +2284,8 @@ if (in_array($action, ['overview','accounting'])) {
         <input type="hidden" name="datalimit" value="">
         <input type="hidden" name="mbgb" value="1048576">
 
-        <div class="portal-filter-grid">
-          <div class="portal-filter-item">
+        <div class="row manager-tickets-row manager-tickets-form-row">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Serveur</label>
             <select name="server" class="form-control" required>
               <option value="all">all</option>
@@ -2143,7 +2297,7 @@ if (in_array($action, ['overview','accounting'])) {
               <?php endif; ?>
             </select>
           </div>
-          <div class="portal-filter-item">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Profil</label>
             <select name="profile" required class="form-control" id="mgrTicketProfile">
               <option value="">— Sélectionner —</option>
@@ -2157,11 +2311,11 @@ if (in_array($action, ['overview','accounting'])) {
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="portal-filter-item">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Quantité</label>
             <input type="number" name="qty" min="1" max="500" value="10" required class="form-control">
           </div>
-          <div class="portal-filter-item">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Longueur du code</label>
             <select name="userl" class="form-control">
               <option value="4">4</option>
@@ -2171,18 +2325,18 @@ if (in_array($action, ['overview','accounting'])) {
               <option value="8">8</option>
             </select>
           </div>
-          <div class="portal-filter-item">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Préfixe</label>
             <input type="text" name="prefix" maxlength="6" placeholder="ex: ADA" class="form-control">
           </div>
-          <div class="portal-filter-item">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Destination du lot</label>
             <select name="manager_assign_mode" class="form-control" id="mgrAssignMode">
               <option value="global">Stock gérant</option>
               <option value="seller">Attribuer à un vendeur</option>
             </select>
           </div>
-          <div class="portal-filter-item" id="mgrSellerTargetWrap" style="display:none;">
+          <div class="portal-filter-item col-3 col-box-12 manager-bootstrap-col" id="mgrSellerTargetWrap" style="display:none;">
             <label class="transfer-label">Vendeur destinataire</label>
             <select name="seller_id" class="form-control" id="mgrSellerTarget">
               <option value="">— Sélectionner —</option>
@@ -2191,7 +2345,7 @@ if (in_array($action, ['overview','accounting'])) {
               <?php endforeach; ?>
             </select>
           </div>
-          <div class="portal-filter-item portal-filter-item-wide">
+          <div class="portal-filter-item portal-filter-item-wide col-6 col-box-12 manager-bootstrap-col">
             <label class="transfer-label">Commentaire / nom du lot</label>
             <input type="text" name="adcomment" class="form-control" placeholder="ex: lot-03H-2026-05-07">
           </div>
@@ -2208,24 +2362,40 @@ if (in_array($action, ['overview','accounting'])) {
       <?php endif; ?>
     </div>
   </div>
+  </div>
 </div>
 
-<div class="portal-summary-grid" style="margin-top:18px;">
-  <div class="portal-summary-card portal-summary-card-blue">
+<div class="container-fluid manager-tickets-summary-container">
+<div class="row manager-tickets-row manager-tickets-summary-row manager-tickets-grid" style="margin-top:18px;">
+  <div class="col-3 col-box-6 manager-bootstrap-col">
+  <div class="portal-summary-card portal-summary-card-blue manager-color-card bg-blue">
     <span class="portal-summary-label">Stock gérant</span>
     <span class="portal-summary-value"><?= $managerGlobalStockCount ?></span>
     <span class="portal-summary-sub">lots non encore attribués</span>
   </div>
-  <div class="portal-summary-card portal-summary-card-green">
+  </div>
+  <div class="col-3 col-box-6 manager-bootstrap-col">
+  <div class="portal-summary-card portal-summary-card-green manager-color-card bg-green">
     <span class="portal-summary-label">Vendeurs actifs</span>
     <span class="portal-summary-value"><?= count($managerSellersData) ?></span>
     <span class="portal-summary-sub">même session que le gérant</span>
   </div>
-  <div class="portal-summary-card portal-summary-card-violet">
+  </div>
+  <div class="col-3 col-box-6 manager-bootstrap-col">
+  <div class="portal-summary-card portal-summary-card-violet manager-color-card bg-yellow">
+    <span class="portal-summary-label">Profils disponibles</span>
+    <span class="portal-summary-value"><?= count($hotspotProfiles) ?></span>
+    <span class="portal-summary-sub">forfaits MikroTik chargés</span>
+  </div>
+  </div>
+  <div class="col-3 col-box-6 manager-bootstrap-col">
+  <div class="portal-summary-card portal-summary-card-violet manager-color-card bg-red">
     <span class="portal-summary-label">Stock vendeur total</span>
     <span class="portal-summary-value"><?= array_sum(array_map('array_sum', $allSellerStock)) ?></span>
     <span class="portal-summary-sub">tickets transférés et non utilisés</span>
   </div>
+  </div>
+</div>
 </div>
 </div></div>
 

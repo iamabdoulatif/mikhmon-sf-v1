@@ -1,10 +1,7 @@
 /* ─────────────────────────────────────────────────────────────
    LOGIN PAGE
    ───────────────────────────────────────────────────────────── */
-.auth-screen {
-  background-color: #2f353a;
-  min-height: 100vh;
-}
+/* .auth-screen base → voir section AUTH-SCREEN ci-dessous (ligne ~182) */
 .portal-auth-wrap,
 .seller-login-wrap {
   display: flex;
@@ -178,6 +175,238 @@
   border-top: 1px solid rgba(128,128,128,.2);
 }
 .login-footer img { height: 44px; object-fit: contain; opacity: .9; }
+
+/* ─────────────────────────────────────────────────────────────
+   AUTH-SCREEN — Design premium (vendeur / gérant / admin)
+   Palette SafeLink Africa :
+     Corail  #F06030  · Ambre   #F5A020
+     Teal    #1ABC9C  · Nuit    #0F1923
+   ───────────────────────────────────────────────────────────── */
+.auth-screen {
+  background: linear-gradient(145deg, #0F1923 0%, #162030 45%, #0D1620 100%);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+}
+.auth-screen::before {
+  content: '';
+  position: fixed;
+  top: -10%; right: -5%;
+  width: 420px; height: 420px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240,96,48,.10) 0%, transparent 70%);
+  pointer-events: none;
+}
+.auth-screen::after {
+  content: '';
+  position: fixed;
+  bottom: -10%; left: -5%;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245,160,32,.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+.auth-screen .portal-auth-wrap {
+  padding: 5vh 16px 32px !important;
+  align-items: center !important;
+  min-height: 100vh;
+}
+/* Carte blanche */
+.auth-screen .login-card.card {
+  background: #FFFFFF !important;
+  border: none !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 32px 64px rgba(0,0,0,.45),
+    0 0 0 1px rgba(240,96,48,.08),
+    0 0 120px rgba(240,96,48,.04) !important;
+  overflow: hidden;
+}
+/* En-tête orange → ambre */
+.auth-screen .login-card .card-header {
+  background: linear-gradient(135deg, #F06030 0%, #F5A020 100%) !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding: 14px 20px 12px !important;
+}
+.auth-screen .login-card .card-header h3 {
+  color: #fff !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  opacity: .95;
+  margin: 0;
+}
+/* Corps */
+.auth-screen .login-card-body {
+  padding: 22px 24px 14px !important;
+  background: #FFFFFF;
+}
+/* Zone logo */
+.auth-screen .login-logo {
+  text-align: center;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(240,96,48,.10);
+}
+.auth-screen .login-logo img {
+  width: 52px; height: 52px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(240,96,48,.15);
+}
+.auth-screen .login-logo span {
+  display: block;
+  font-size: 22px !important;
+  font-weight: 800 !important;
+  color: #1C2833 !important;
+  margin-top: 10px !important;
+  letter-spacing: -.01em;
+}
+.auth-screen .login-logo-subtitle {
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  color: #F06030 !important;
+  opacity: 1 !important;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.auth-screen .login-logo-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #7F8C8D !important;
+  letter-spacing: .03em;
+}
+.auth-screen .login-logo-contact::before {
+  content: '\f095';
+  font-family: FontAwesome;
+  font-size: 10px;
+  color: #1ABC9C;
+}
+/* Onglets */
+.auth-screen .login-tabs {
+  border-bottom: 2px solid #F2F4F5 !important;
+  margin-bottom: 16px !important;
+  background: #FAFBFC;
+  border-radius: 8px 8px 0 0;
+}
+.auth-screen .login-tab-btn {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  padding: 10px 4px !important;
+  border-radius: 0 !important;
+  color: #BDC3C7 !important;
+  letter-spacing: .02em;
+  transition: color .2s, border-color .2s !important;
+}
+.auth-screen .login-tab-btn i { font-size: 15px !important; }
+.auth-screen .login-tab-btn.tab-admin   { color: #F06030 !important; border-bottom-color: #F06030 !important; }
+.auth-screen .login-tab-btn.tab-manager { color: #F5A020 !important; border-bottom-color: #F5A020 !important; }
+.auth-screen .login-tab-btn.tab-vendor  { color: #1ABC9C !important; border-bottom-color: #1ABC9C !important; }
+.auth-screen .login-tab-btn.inactive    { color: #C8D0D8 !important; border-bottom-color: transparent !important; }
+/* Badges rôle */
+.auth-screen .badge-admin   { background: #FEF0EB !important; color: #F06030 !important; border: 1px solid rgba(240,96,48,.15) !important; }
+.auth-screen .badge-manager { background: #FEF9E7 !important; color: #D98A00 !important; border: 1px solid rgba(245,160,32,.20) !important; }
+.auth-screen .badge-vendor  { background: #E8F8F5 !important; color: #16A085 !important; border: 1px solid rgba(26,188,156,.20) !important; }
+/* Champs de saisie */
+.auth-screen .login-field {
+  height: 46px !important;
+  font-size: 15px !important;
+  padding: 0 14px !important;
+  border: 1.5px solid #E8ECF0 !important;
+  border-radius: 10px !important;
+  background: #F8FAFB !important;
+  color: #1C2833 !important;
+  transition: border-color .2s, box-shadow .2s, background .2s !important;
+  margin-bottom: 10px !important;
+  width: 100%;
+  box-sizing: border-box;
+}
+.auth-screen .login-field:focus {
+  border-color: #F06030 !important;
+  background: #FFFFFF !important;
+  box-shadow: 0 0 0 3px rgba(240,96,48,.12) !important;
+  outline: none;
+}
+.auth-screen .login-field::placeholder { color: #B2BEC3 !important; }
+/* Boutons submit */
+.auth-screen .login-submit {
+  width: 100%;
+  height: 48px !important;
+  font-size: 15px !important;
+  font-weight: 700 !important;
+  letter-spacing: .04em;
+  border-radius: 10px !important;
+  margin-top: 14px !important;
+  border: none !important;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, opacity .2s !important;
+}
+.auth-screen .login-submit:hover  { opacity: 1 !important; transform: translateY(-2px); }
+.auth-screen .login-submit:active { transform: translateY(0); }
+.auth-screen .btn-admin {
+  background: linear-gradient(135deg, #F06030 0%, #F07A35 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 15px rgba(240,96,48,.30);
+}
+.auth-screen .btn-admin:hover   { box-shadow: 0 8px 24px rgba(240,96,48,.45) !important; }
+.auth-screen .btn-manager {
+  background: linear-gradient(135deg, #F5A020 0%, #F5C030 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 15px rgba(245,160,32,.28);
+}
+.auth-screen .btn-manager:hover { box-shadow: 0 8px 24px rgba(245,160,32,.40) !important; }
+.auth-screen .btn-vendor {
+  background: linear-gradient(135deg, #1ABC9C 0%, #16A085 100%) !important;
+  color: #fff !important;
+  box-shadow: 0 5px 15px rgba(26,188,156,.28);
+}
+.auth-screen .btn-vendor:hover  { box-shadow: 0 8px 24px rgba(26,188,156,.40) !important; }
+/* Message d'erreur */
+.auth-screen .login-error {
+  border-radius: 8px !important;
+  font-size: 13px !important;
+  padding: 10px 14px !important;
+  margin-top: 10px !important;
+}
+/* Pied de carte */
+.auth-screen .login-footer {
+  padding: 14px 20px 16px !important;
+  background: #FAFBFC !important;
+  border-top: 1px solid #F0F3F4 !important;
+  text-align: center;
+}
+.auth-screen .login-footer img {
+  height: 38px !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+.auth-screen .login-footer::before {
+  content: 'Powered by';
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #AAB3BB;
+  margin-bottom: 6px;
+}
+.auth-screen .portal-auth-footer-link a {
+  color: #7F8C8D;
+  font-size: 13px;
+  text-decoration: none;
+}
+.auth-screen .portal-auth-footer-link a:hover { color: #F06030; }
+/* Mobile */
+@media (max-width: 480px) {
+  .auth-screen .portal-auth-wrap { padding: 16px 12px 24px !important; }
+  .auth-screen .login-card-body  { padding: 18px 16px 12px !important; }
+  .auth-screen .login-card.card  { border-radius: 14px !important; }
+}
 
 /* ─────────────────────────────────────────────────────────────
    NAVIGATION / SIDEBAR
@@ -356,7 +585,7 @@
   flex-wrap: wrap;
 }
 .btn-accept {
-  background: #27ae60;
+  background: #4dbd74;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -369,7 +598,7 @@
 }
 .btn-accept:hover { opacity: .85; }
 .btn-decline {
-  background: #e74c3c;
+  background: #f86c6b;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -411,7 +640,7 @@
   overflow: hidden;
 }
 .stock-board-card-self {
-  border-color: #2980b9;
+  border-color: #20a8d8;
 }
 .stock-board-card-header {
   padding: 12px 16px;
@@ -423,8 +652,8 @@
   justify-content: space-between;
 }
 .stock-board-card-self .stock-board-card-header {
-  background: #eaf4fb;
-  border-bottom-color: #2980b9;
+  background: #e6f6fb;
+  border-bottom-color: #20a8d8;
 }
 .stock-board-card-title {
   font-weight: bold;
@@ -433,14 +662,14 @@
 }
 .stock-board-card-self-label {
   font-size: 11px;
-  color: #2980b9;
+  color: #20a8d8;
 }
 .stock-board-total-badge {
   border-radius: 10px;
   padding: 2px 10px;
   font-weight: bold;
   font-size: 13px;
-  background: #e8f5e9;
+  background: #d6f0df;
   color: #2e7d32;
 }
 .stock-board-total-badge.empty {
@@ -461,10 +690,10 @@
 .stock-profile-row:last-child { border-bottom: none; }
 .stock-profile-name { font-size: 13px; flex: 1; }
 .stock-profile-qty  { font-weight: bold; font-size: 14px; min-width: 30px; text-align: right; }
-.stock-profile-qty.qty-low { color: #e74c3c; }
-.stock-profile-qty.qty-ok  { color: #27ae60; }
+.stock-profile-qty.qty-low { color: #f86c6b; }
+.stock-profile-qty.qty-ok  { color: #4dbd74; }
 .stock-request-btn {
-  background: #2980b9;
+  background: #20a8d8;
   color: #fff;
   border: none;
   border-radius: 4px;
@@ -476,7 +705,7 @@
 }
 .stock-request-btn:hover { opacity: .85; }
 .stock-request-all-btn {
-  background: #8e44ad;
+  background: #ffc107;
   color: #fff;
   border: none;
   border-radius: 5px;
@@ -2883,3 +3112,99 @@
 }
 .fr-adv-toggle:hover { background: #f1f5f9; color: #1e293b; }
 .fr-adv-toggle i:first-child { color: #008BC9; }
+
+/* ── ACCOUNTING — PROFILE BADGES ─────────────────────────────────────────── */
+.acct-profile-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin: 2px 4px 2px 0;
+  padding: 3px 10px;
+  border-radius: 12px;
+  background: #eef2f7;
+  color: #243447;
+  font-size: 12px;
+  white-space: nowrap;
+}
+.acct-profile-name {
+  font-weight: 600;
+}
+.acct-profile-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: #008BC9;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* stack badges vertically so counts stay aligned */
+td[data-label="Profils vendus"] {
+  display: table-cell; /* keep table layout */
+}
+td[data-label="Profils vendus"] .acct-profile-badge {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 180px;
+  box-sizing: border-box;
+}
+
+/* Manager Bootstrap-style responsive rows */
+.manager-portal .container-fluid {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+  padding-right: 0;
+  padding-left: 0;
+  box-sizing: border-box;
+}
+.manager-portal .mgr-summary-cards.row,
+.manager-portal .manager-tickets-summary-row.row {
+  display: block !important;
+  grid-template-columns: none !important;
+  gap: 0 !important;
+}
+.manager-portal .mgr-accounting-form.row,
+.manager-portal .manager-tickets-form-row.row,
+.manager-portal .manager-vendors-form-grid.row {
+  display: block !important;
+  grid-template-columns: none !important;
+  gap: 0 !important;
+}
+.manager-portal .manager-bootstrap-col {
+  box-sizing: border-box;
+  padding-right: 5px;
+  padding-left: 5px;
+  margin-bottom: 10px !important;
+}
+.manager-portal .manager-bootstrap-col > .manager-color-card,
+.manager-portal .manager-bootstrap-col > .portal-summary-card {
+  height: 100%;
+  margin: 0;
+}
+@media screen and (min-width: 751px) {
+  .manager-portal .mgr-summary-cards.row > .manager-bootstrap-col,
+  .manager-portal .manager-tickets-summary-row.row > .manager-bootstrap-col {
+    width: 25% !important;
+  }
+}
+@media screen and (max-width: 750px) {
+  .manager-portal .mgr-summary-cards.row > .manager-bootstrap-col,
+  .manager-portal .manager-tickets-summary-row.row > .manager-bootstrap-col {
+    width: 50% !important;
+  }
+}
+@media screen and (max-width: 520px) {
+  .manager-portal .mgr-summary-cards.row > .manager-bootstrap-col,
+  .manager-portal .manager-tickets-summary-row.row > .manager-bootstrap-col {
+    width: 50% !important;
+  }
+}

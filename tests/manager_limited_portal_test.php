@@ -16,8 +16,9 @@ $required = array(
     'connected users card' => 'Connectés maintenant',
     'ticket workspace card' => 'Générer &amp; imprimer',
     'vendor sales overview' => 'Ventes des vendeurs',
-    'overview route allowed' => "\$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'logout')",
+    'overview route allowed' => "\$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'vendors', 'logout')",
     'manager seller accounting right' => 'Compte vendeur',
+    'manager vendors route allowed' => 'href="./manager.php?action=vendors"',
     'manager accounting route url' => "\$managerAccountingUrl = './manager.php?action=accounting&idbl='",
     'manager dashboard redirect for denied routes' => 'manager.php?action=dashboard',
 );
@@ -31,7 +32,6 @@ foreach ($required as $label => $needle) {
 
 $forbiddenManagerNav = array(
     'manager transfer nav' => 'href="./manager.php?action=transfer"',
-    'manager vendors nav' => 'href="./manager.php?action=vendors"',
     'manager logs nav' => 'href="./manager.php?action=logs"',
     'manager admin user list links' => 'href="./?hotspot=users',
     'manager admin profile list links' => 'hotspot=users-by-profile',

@@ -107,7 +107,7 @@ if ($targets !== array('alpha', 'beta')) {
 
 $managerPage = file_get_contents(__DIR__ . '/../manager.php');
 $adminPage = file_get_contents(__DIR__ . '/../settings/manage_sellers.php');
-if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'logout')") === false) {
+if (strpos($managerPage, "\$managerAllowedActions = array('dashboard', 'overview', 'accounting', 'tickets', 'vendors', 'logout')") === false) {
   fwrite(STDERR, 'manager page must allow manager seller accounting without admin dashboard access' . PHP_EOL);
   exit(1);
 }

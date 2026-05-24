@@ -248,33 +248,46 @@ $hasPushData = $lastPush !== null;
 <?php endif; ?>
 
 <!-- ── STATS STRIP ────────────────────────────────────────────────── -->
-<div class="fr-stats">
-  <div class="fr-stat danger">
-    <div class="fr-stat-icon"><i class="fa fa-exclamation-circle"></i></div>
-    <div>
-      <div class="fr-stat-val"><?= $openCount ?></div>
-      <div class="fr-stat-lbl">Nouveaux</div>
-    </div>
-  </div>
-  <div class="fr-stat warning">
-    <div class="fr-stat-icon"><i class="fa fa-eye"></i></div>
-    <div>
-      <div class="fr-stat-val"><?= $ackCount ?></div>
-      <div class="fr-stat-lbl">Reconnus</div>
-    </div>
-  </div>
-  <div class="fr-stat success">
-    <div class="fr-stat-icon"><i class="fa fa-check-circle"></i></div>
-    <div>
-      <div class="fr-stat-val"><?= $resolvedCount ?></div>
-      <div class="fr-stat-lbl">Résolus</div>
-    </div>
-  </div>
-  <div class="fr-stat info">
-    <div class="fr-stat-icon"><i class="fa fa-list-alt"></i></div>
-    <div>
-      <div class="fr-stat-val"><?= $totalCount ?></div>
-      <div class="fr-stat-lbl">Total</div>
+<div class="card dashboard-hotspot-card" style="margin-bottom:12px;">
+  <div class="card-body" style="padding:10px 12px 4px;">
+    <div class="row dashboard-hotspot-grid">
+
+      <div class="col-3 col-box-6">
+        <div class="box bg-red bmh-75">
+          <a href="#">
+            <h1><?= $openCount ?></h1>
+            <div><i class="fa fa-exclamation-circle"></i> Nouveaux</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-3 col-box-6">
+        <div class="box bg-yellow bmh-75">
+          <a href="#">
+            <h1><?= $ackCount ?></h1>
+            <div><i class="fa fa-eye"></i> Reconnus</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-3 col-box-6">
+        <div class="box bg-green bmh-75">
+          <a href="#">
+            <h1><?= $resolvedCount ?></h1>
+            <div><i class="fa fa-check-circle"></i> Résolus</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="col-3 col-box-6">
+        <div class="box bg-blue bmh-75">
+          <a href="#">
+            <h1><?= $totalCount ?></h1>
+            <div><i class="fa fa-list-alt"></i> Total incidents</div>
+          </a>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -857,12 +870,12 @@ echo htmlspecialchars(anti_fraud_build_script($webhookUrl, $fraudApiKey, $sessio
       <h3><i class="fa fa-sitemap" style="color:#008BC9;margin-right:7px;"></i>Routeurs branchés en point d'accès</h3>
       <p>Analyse les IP statiques visibles dans ARP et les voisins MikroTik. Les IP de gestion AP en 192.168.x.x sont priorisées; les clients ordinaires dans le pool DHCP sont ignorés sauf signature routeur forte.</p>
     </div>
-    <div class="fr-ap-stats">
-      <span class="fr-mini-badge"><i class="fa fa-server"></i><?= (int)($apStats['total'] ?? 0) ?> détecté<?= ((int)($apStats['total'] ?? 0) > 1) ? 's' : '' ?></span>
-      <span class="fr-mini-badge danger"><i class="fa fa-exclamation-triangle"></i><?= (int)($apStats['conflicts'] ?? 0) ?> conflit<?= ((int)($apStats['conflicts'] ?? 0) > 1) ? 's' : '' ?></span>
-      <span class="fr-mini-badge"><i class="fa fa-check"></i><?= (int)($apStats['static_ok'] ?? 0) ?> IP hors DHCP</span>
-      <span class="fr-mini-badge danger"><i class="fa fa-bolt"></i><?= $rogueDhcpCount ?> DHCP rogue</span>
-    </div>
+  </div>
+  <div class="row dashboard-hotspot-grid fr-tab-stat-grid">
+    <div class="col-3 col-box-6"><div class="box bg-blue bmh-75"><a href="#"><h1><?= (int)($apStats['total'] ?? 0) ?></h1><div><i class="fa fa-server"></i> AP détectés</div></a></div></div>
+    <div class="col-3 col-box-6"><div class="box bg-red bmh-75"><a href="#"><h1><?= (int)($apStats['conflicts'] ?? 0) ?></h1><div><i class="fa fa-exclamation-triangle"></i> Conflits</div></a></div></div>
+    <div class="col-3 col-box-6"><div class="box bg-green bmh-75"><a href="#"><h1><?= (int)($apStats['static_ok'] ?? 0) ?></h1><div><i class="fa fa-check"></i> IP hors DHCP</div></a></div></div>
+    <div class="col-3 col-box-6"><div class="box bg-yellow bmh-75"><a href="#"><h1><?= $rogueDhcpCount ?></h1><div><i class="fa fa-bolt"></i> DHCP rogue</div></a></div></div>
   </div>
 
   <div class="fr-rogue-panel">
@@ -997,14 +1010,15 @@ echo htmlspecialchars(anti_fraud_build_script($webhookUrl, $fraudApiKey, $sessio
       <h3><i class="fa fa-desktop" style="color:#008BC9;margin-right:6px;"></i>Appareils détectés par ticket hotspot</h3>
       <p>Le script MikroTik remonte les appareils actifs toutes les 10 minutes : TV, ordinateurs, consoles, tablettes et téléphones.</p>
     </div>
-    <div class="fr-device-summary">
-      <span class="fr-mini-badge"><i class="fa fa-list"></i><?= $deviceCount ?> total</span>
-      <span class="fr-mini-badge warn"><i class="fa fa-exclamation-triangle"></i><?= $deviceRiskCount ?> macOS/PC/TV/console</span>
-      <span class="fr-mini-badge danger"><i class="fa fa-ban"></i><?= $deviceBlockedCount ?> bloqué<?= $deviceBlockedCount > 1 ? 's' : '' ?></span>
-      <?php if ($deviceLastSeen): ?>
-        <span class="fr-mini-badge"><i class="fa fa-clock-o"></i><?= htmlspecialchars($deviceLastSeen) ?></span>
-      <?php endif; ?>
-    </div>
+  </div>
+  <div class="row dashboard-hotspot-grid fr-tab-stat-grid">
+    <div class="col-3 col-box-6"><div class="box bg-blue bmh-75"><a href="#"><h1><?= $deviceCount ?></h1><div><i class="fa fa-list"></i> Total appareils</div></a></div></div>
+    <div class="col-3 col-box-6"><div class="box bg-yellow bmh-75"><a href="#"><h1><?= $deviceRiskCount ?></h1><div><i class="fa fa-exclamation-triangle"></i> PC/TV/console</div></a></div></div>
+    <div class="col-3 col-box-6"><div class="box bg-red bmh-75"><a href="#"><h1><?= $deviceBlockedCount ?></h1><div><i class="fa fa-ban"></i> Bloqués</div></a></div></div>
+    <div class="col-3 col-box-6"><div class="box bg-green bmh-75"><a href="#">
+      <h1 class="acct-period-h1"><?= $deviceLastSeen ? htmlspecialchars($deviceLastSeen) : '—' ?></h1>
+      <div><i class="fa fa-clock-o"></i> Dernière vue</div>
+    </a></div></div>
   </div>
 
   <?php if (empty($devices)): ?>
