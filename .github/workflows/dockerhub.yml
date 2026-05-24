@@ -46,7 +46,7 @@ jobs:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           BUILD_STAMP: ${{ env.BUILD_STAMP }}
           BUILD_VERSION: ${{ env.BUILD_VERSION }}
-          MANIFEST_TAGS: latest v1
+          MANIFEST_TAGS: latest
         run: bash tools/ci-build-push-flattened.sh
 
       - name: Update DockerHub description

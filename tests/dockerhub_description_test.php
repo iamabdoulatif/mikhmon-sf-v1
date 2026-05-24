@@ -25,7 +25,7 @@ $requiredReadmeSnippets = [
     'https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/mobile-ip-binding-readable.png',
     'width="720"',
     'latif225/mikhmonv3-safelinkhub:latest',
-    'latif225/mikhmonv3-safelinkhub:v1',
+    'manifeste multi-architecture',
     'skopeo',
 ];
 
@@ -37,6 +37,10 @@ foreach ($requiredReadmeSnippets as $snippet) {
 
 if (strpos($readme, 'mikhmon-dockerhub-assets') !== false) {
     $failures[] = 'DockerHub README still references the old external screenshot repository.';
+}
+
+if (strpos($readme, 'latif225/mikhmonv3-safelinkhub:v1') !== false) {
+    $failures[] = 'DockerHub README must not advertise the legacy v1 tag.';
 }
 
 $requiredAssets = [

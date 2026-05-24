@@ -19,18 +19,26 @@ if (strpos($sellerPage, '$seller_connection_error') === false || strpos($manager
   exit(1);
 }
 
-include $root . '/lib/routeros_api.class.php';
-$session = 'ALB-TECH';
 include $root . '/include/config.php';
-include $root . '/include/readcfg.php';
 
-if ($iphost !== '172.25.194.29' || $userhost !== 'admin' || decrypt($passwdhost) === '') {
-  fwrite(STDERR, 'ALB-TECH router config must point to the reachable RouterOS API and decrypt cleanly' . PHP_EOL);
+$routerSessions = array_filter(array_keys((array) $data), function ($key) {
+  return $key !== 'mikhmon';
+});
+
+if (!empty($routerSessions)) {
+  fwrite(STDERR, 'default Docker image must start with zero router sessions' . PHP_EOL);
   exit(1);
 }
 
-if (strpos($passwdhost, 'v2:') === 0) {
-  fwrite(STDERR, 'Docker image router credentials must not depend on a host-local secret.key.php' . PHP_EOL);
+foreach ((array) $data as $sessionName => $sessionData) {
+  if ($sessionName !== 'mikhmon' && is_array($sessionData) && strpos((string) ($sessionData[3] ?? ''), 'v2:') !== false) {
+    fwrite(STDERR, 'Docker image router credentials must not depend on a host-local secret.key.php' . PHP_EOL);
+    exit(1);
+  }
+}
+
+if (empty($data['mikhmon'][1]) || empty($data['mikhmon'][2])) {
+  fwrite(STDERR, 'default admin credentials must remain present after router session reset' . PHP_EOL);
   exit(1);
 }
 

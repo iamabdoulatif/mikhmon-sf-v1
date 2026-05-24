@@ -28,28 +28,20 @@ Les captures ci-dessous sont recadrees pour rester lisibles directement dans Doc
   <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/mobile-ip-binding-readable.png" alt="Formulaire IP Binding Mikhmon lisible sur mobile" width="520">
 </p>
 
-## Tags disponibles
+## Tag disponible
 
 ```text
 latif225/mikhmonv3-safelinkhub:latest
-latif225/mikhmonv3-safelinkhub:v1
-latif225/mikhmonv3-safelinkhub:arm32
-latif225/mikhmonv3-safelinkhub:arm
-latif225/mikhmonv3-safelinkhub:armv7
-latif225/mikhmonv3-safelinkhub:arm64
-latif225/mikhmonv3-safelinkhub:hap-ax-lite
-latif225/mikhmonv3-safelinkhub:hap-ax2
-latif225/mikhmonv3-safelinkhub:hap-ax3
-latif225/mikhmonv3-safelinkhub:rb3011
-latif225/mikhmonv3-safelinkhub:rb4011
 ```
 
-Mapping recommande:
+Le tag `latest` est un manifeste multi-architecture aplati avec `skopeo`.
+DockerHub choisit automatiquement l'image qui correspond au routeur ou au serveur:
 
-- `arm` / `arm32` / `armv7` -> RouterOS `architecture-name=arm` (hAP ax lite, RB3011, RB4011)
-- `arm64` -> RouterOS `architecture-name=arm64` (hAP ax2, hAP ax3)
-
-Les tags `hap-ax-lite`, `rb3011`, `rb4011`, `hap-ax2`, `hap-ax3` pointent vers l'image de l'architecture correspondante.
+- `linux/amd64` pour les serveurs classiques.
+- `linux/arm64` pour les routeurs ARM64 comme hAP ax2 / hAP ax3.
+- `linux/s390x`.
+- `linux/arm/v6`.
+- `linux/arm/v7` pour les routeurs ARM comme hAP ax lite.
 
 ## Fonctions incluses
 
@@ -77,7 +69,7 @@ http://localhost:8080
 
 ## Utilisation MikroTik RouterOS containers
 
-Sur hAP ax lite, preferer l'import de l'image ARMv7 aplatie generee par la pipeline GitHub Actions.
+Sur RouterOS 7, utiliser le tag unique `latest`. Le routeur selectionne automatiquement l'architecture compatible depuis le manifeste DockerHub.
 
 Exemple reseau RouterOS:
 
@@ -91,7 +83,8 @@ Exemple reseau RouterOS:
 Exemple container:
 
 ```routeros
-/container/add file=tmp/mikhmon-flat-arm32-mikrotik.tar root-dir=mikhmon-app name=mikhmon interface=MIKHMON logging=yes start-on-boot=yes
+/container/config/set registry-url=https://registry-1.docker.io tmpdir=/tmp
+/container/add remote-image=latif225/mikhmonv3-safelinkhub:latest check-certificate=no root-dir=/flash/mikhmon-root name=mikhmon interface=MIKHMON logging=yes start-on-boot=yes
 /container/start [find name="mikhmon"]
 ```
 

@@ -24,7 +24,7 @@ $checks = array(
     'build timestamp step' => 'BUILD_STAMP=',
     'skopeo install step' => 'sudo apt-get install -y skopeo',
     'qemu setup step' => 'docker/setup-qemu-action@v3',
-    'multi-arch manifest tags' => 'MANIFEST_TAGS: latest v1',
+    'latest-only multi-arch manifest tag' => 'MANIFEST_TAGS: latest',
     'dockerhub tag cleanup default' => 'DELETE_DOCKERHUB_EXISTING_TAGS: "1"',
 );
 
@@ -33,6 +33,11 @@ foreach ($checks as $label => $needle) {
         fwrite(STDERR, $label . " missing from dockerhub workflow\n");
         exit(1);
     }
+}
+
+if (strpos($workflowText, 'MANIFEST_TAGS: latest v1') !== false) {
+    fwrite(STDERR, "DockerHub workflow must not publish the legacy v1 manifest tag\n");
+    exit(1);
 }
 
 $dockerChecks = array(

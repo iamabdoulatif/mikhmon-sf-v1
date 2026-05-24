@@ -5,7 +5,7 @@ IMAGE_NAME="${IMAGE_NAME:-latif225/mikhmonv3-safelinkhub}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile.mikrotik}"
 BUILD_STAMP="${BUILD_STAMP:-$(date -u +%Y%m%d%H%M%S)}"
 BUILD_VERSION="${BUILD_VERSION:-v3.0.${BUILD_STAMP}}"
-MANIFEST_TAGS="${MANIFEST_TAGS:-latest v1}"
+MANIFEST_TAGS="${MANIFEST_TAGS:-latest}"
 PUSH_IMAGES="${PUSH_IMAGES:-1}"
 DELETE_DOCKERHUB_EXISTING_TAGS="${DELETE_DOCKERHUB_EXISTING_TAGS:-1}"
 MIN_COMPRESSED_MB="${MIN_COMPRESSED_MB:-11}"
@@ -14,10 +14,10 @@ SIZE_CHECK_PLATFORMS="${SIZE_CHECK_PLATFORMS:-linux/arm64 linux/arm/v6 linux/arm
 
 PLATFORM_SPECS=(
   "linux/amd64|amd64|amd64"
-  "linux/arm64|arm64 hap-ax2 ax2|arm64"
+  "linux/arm64|arm64|arm64"
   "linux/s390x|s390x|s390x"
-  "linux/arm/v6|armv6 arm32v6|arm-v6"
-  "linux/arm/v7|armv7 arm32 hap-ax-lite|arm-v7"
+  "linux/arm/v6|armv6|arm-v6"
+  "linux/arm/v7|armv7|arm-v7"
 )
 
 push_enabled() {
@@ -31,6 +31,8 @@ if push_enabled && [[ -z "${DOCKERHUB_USERNAME:-}" || -z "${DOCKERHUB_TOKEN:-}" 
   echo "DOCKERHUB_USERNAME and DOCKERHUB_TOKEN are required." >&2
   exit 1
 fi
+
+export IMAGE_NAME DOCKERHUB_USERNAME DOCKERHUB_TOKEN MANIFEST_TAGS
 
 docker_login() {
   printf '%s' "$DOCKERHUB_TOKEN" | docker login -u "$DOCKERHUB_USERNAME" --password-stdin
@@ -96,6 +98,63 @@ for tag in tags:
     try:
         urllib.request.urlopen(request, timeout=30).close()
         print(f"Deleted old DockerHub tag: {tag}")
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            print(f"DockerHub tag already absent: {tag}")
+            continue
+        raise
+PY
+}
+
+delete_dockerhub_tags() {
+  if ! push_enabled || [[ "$#" -eq 0 ]]; then
+    return 0
+  fi
+
+  TAGS_TO_DELETE="$*" python3 <<'PY'
+import json
+import os
+import sys
+import urllib.error
+import urllib.request
+
+image_name = os.environ["IMAGE_NAME"]
+username = os.environ["DOCKERHUB_USERNAME"]
+password = os.environ["DOCKERHUB_TOKEN"]
+manifest_tags = set(os.environ.get("MANIFEST_TAGS", "").split())
+tags = []
+
+for tag in os.environ.get("TAGS_TO_DELETE", "").split():
+    if tag and tag not in manifest_tags and tag not in tags:
+        tags.append(tag)
+
+if not tags:
+    sys.exit(0)
+
+if "/" not in image_name or image_name.count("/") != 1:
+    print(f"Skipping DockerHub tag cleanup for non-DockerHub image name: {image_name}")
+    sys.exit(0)
+
+namespace, repository = image_name.split("/", 1)
+login_payload = json.dumps({"username": username, "password": password}).encode("utf-8")
+login_request = urllib.request.Request(
+    "https://hub.docker.com/v2/users/login/",
+    data=login_payload,
+    headers={"Content-Type": "application/json"},
+    method="POST",
+)
+
+with urllib.request.urlopen(login_request, timeout=30) as response:
+    token = json.load(response)["token"]
+
+headers = {"Authorization": f"JWT {token}"}
+
+for tag in tags:
+    delete_url = f"https://hub.docker.com/v2/repositories/{namespace}/{repository}/tags/{tag}/"
+    request = urllib.request.Request(delete_url, headers=headers, method="DELETE")
+    try:
+        urllib.request.urlopen(request, timeout=30).close()
+        print(f"Deleted intermediate DockerHub tag: {tag}")
     except urllib.error.HTTPError as exc:
         if exc.code == 404:
             print(f"DockerHub tag already absent: {tag}")
@@ -266,6 +325,10 @@ publish_manifest_tags() {
     "${IMAGE_NAME}:armv7"
 }
 
+cleanup_intermediate_dockerhub_tags() {
+  delete_dockerhub_tags "${PUBLISHED_TAGS[@]}"
+}
+
 if push_enabled; then
   docker_login
   delete_existing_dockerhub_tags
@@ -292,10 +355,11 @@ done
 
 if push_enabled; then
   publish_manifest_tags
+  cleanup_intermediate_dockerhub_tags
 fi
 
 if push_enabled; then
-  echo "Pushed flattened compressed images to ${IMAGE_NAME}: ${PUBLISHED_TAGS[*]}; manifests: ${MANIFEST_TAGS}"
+  echo "Pushed flattened compressed images to ${IMAGE_NAME}; final manifest tags: ${MANIFEST_TAGS}"
 else
   echo "Built flattened compressed images locally: ${PUBLISHED_TAGS[*]}"
 fi

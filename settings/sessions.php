@@ -72,14 +72,6 @@ if (!isset($_SESSION["mikhmon"])) {
   			<h3 class="card-title"><i class="fa fa-gear"></i> <?= $_admin_settings ?> &nbsp; | &nbsp;&nbsp;<i onclick="location.reload();" class="fa fa-refresh pointer " title="Reload data"></i></h3>
   		</div>
       <div class="card-body">
-        <?php $missingSessionAlert = !empty($_GET['missing-session']) ? (string)$_GET['missing-session'] : ''; ?>
-        <?php if ($missingSessionAlert !== '' && !preg_match('/^new-\d+$/', $missingSessionAlert)): ?>
-        <div class="bg-warning" style="padding:12px 14px;border-radius:6px;margin-bottom:16px;color:#243447;">
-          <b><i class="fa fa-exclamation-triangle"></i> Session routeur introuvable</b><br>
-          La session <code><?= htmlspecialchars($missingSessionAlert) ?></code> n'existe plus dans <code>include/config.php</code>.
-          Choisissez une session valide ou recréez-la avant d’ouvrir cette page.
-        </div>
-        <?php endif; ?>
         <div class="row">
           <div class="col-6">
             <div class="card">
