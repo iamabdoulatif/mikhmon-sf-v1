@@ -22,6 +22,8 @@ $checks = array(
     'delete_dockerhub_tags',
     'cleanup_intermediate_dockerhub_tags',
     'hub.docker.com/v2/repositories',
+    'DockerHub repository not found yet',
+    'skipping old tag cleanup',
     'linux/amd64|amd64',
     'linux/arm64|arm64',
     'linux/s390x|s390x',

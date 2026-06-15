@@ -83,8 +83,14 @@ next_url = f"https://hub.docker.com/v2/repositories/{namespace}/{repository}/tag
 
 while next_url:
     request = urllib.request.Request(next_url, headers=headers)
-    with urllib.request.urlopen(request, timeout=30) as response:
-        payload = json.load(response)
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            payload = json.load(response)
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            print(f"DockerHub repository not found yet: {namespace}/{repository}; skipping old tag cleanup.")
+            sys.exit(0)
+        raise
     tags.extend(tag["name"] for tag in payload.get("results", []) if tag.get("name"))
     next_url = payload.get("next")
 
