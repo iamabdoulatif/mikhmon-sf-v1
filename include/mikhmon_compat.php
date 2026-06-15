@@ -860,7 +860,7 @@ if (!function_exists('mikhmon_month_map')) {
       . ':if ($nowmonth = "dec") do={ :set nowmm "12";};'
       . '};'
       . ':local nowdate [:tonum ("$nowyear$nowmm$nowdays")];'
-      . ':local nowtime [:tonum ([:pick $time 0 2] . [:pick $time 3 5])];'
+      . ':local nowtime [:tonum ([:pick $time 0 2] . [:pick $time 3 5] . [:pick $time 6 8])];'
       . ':foreach i in [ /ip hotspot user find where profile="' . $profileName . '" ] do={ '
       . ':local comment [ /ip hotspot user get $i comment]; '
       . ':local name [ /ip hotspot user get $i name]; '
@@ -883,7 +883,7 @@ if (!function_exists('mikhmon_month_map')) {
       . ':set hasExp true;};'
       . ':if ([:pick $comment 4 5] = "-" and [:pick $comment 7 8] = "-") do={:set expyear [:pick $comment 0 4];:set expmm [:pick $comment 5 7];:set expdays [:pick $comment 8 10];:set gettime [:pick $comment 11 19]; :set hasExp true;};'
       . ':if ($hasExp = true) do={'
-      . ':local expdate [:tonum ("$expyear$expmm$expdays")] ; :local exptime [:tonum ([:pick $gettime 0 2] . [:pick $gettime 3 5])] ; '
+      . ':local expdate [:tonum ("$expyear$expmm$expdays")] ; :local exptime [:tonum ([:pick $gettime 0 2] . [:pick $gettime 3 5] . [:pick $gettime 6 8])] ; '
       . ':if ($expdate > 0) do={:if (($expdate < $nowdate) or ($expdate = $nowdate and $exptime <= $nowtime)) do={ /ip hotspot user ' . $mode . ' $i; /ip hotspot active remove [find where user=$name];}}'
       . '}'
       . '}';

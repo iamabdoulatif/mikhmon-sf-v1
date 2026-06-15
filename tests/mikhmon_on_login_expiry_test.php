@@ -21,6 +21,8 @@ $checks = array(
   'profile monitor parses month names explicitly' => ':if ($month = "may") do={ :set expmm "05";};',
   'profile monitor checks slash date slices' => '[:pick $comment 3 4] = "/"',
   'profile monitor compares parsed dates' => ':if (($expdate < $nowdate) or ($expdate = $nowdate and $exptime <= $nowtime))',
+  'profile monitor compares current seconds' => '[:pick $time 6 8]',
+  'profile monitor compares expiry seconds' => '[:pick $gettime 6 8]',
   'profile monitor supports RouterOS ISO clock' => '[:pick $date 4 5] = "-"',
   'profile monitor supports RouterOS legacy clock' => '[:pick $date 3 4] = "/"',
   'profile monitor removes active session' => '/ip hotspot active remove [find where user=$name]',

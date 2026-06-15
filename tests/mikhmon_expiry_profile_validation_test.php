@@ -61,6 +61,7 @@ if (strpos($profileAdd, 'graceperiod') !== false || strpos($profileEdit, 'gracep
 
 $expiredCases = array(
   array('may/01/2026 10:00:00', '2026-05-01', '10:00:00', true),
+  array('may/01/2026 10:00:30', '2026-05-01', '10:00:05', false),
   array('2026-05-01 09:59:59', '2026-05-01', '10:00:00', true),
   array('2026-05-01 10:00:01', '2026-05-01', '10:00:00', false),
   array('ticket batch', '2026-05-01', '10:00:00', false),
