@@ -179,18 +179,18 @@ $buildInfo = mikhmon_update_build_info();
             <h4><i class="fa fa-code-fork"></i> Ma chaine de mise a jour</h4>
             <p>
               Cette installation Mikhmon est reliee au depot GitHub
-              <b>iamabdoulatif/mikhmonv3-safelinkhub</b>. Chaque correction validee depuis le localhost est poussee sur GitHub,
+              <b>iamabdoulatif/mikhmon-sf-v1</b>. Chaque correction validee depuis le localhost est poussee sur GitHub,
               puis GitHub Actions construit les images RouterOS et les publie sur DockerHub.
             </p>
             <p>
               Les containers MikroTik distants peuvent ensuite comparer leur build local avec l'image
-              <b>latif225/mikhmonv3-safelinkhub:latest</b> et signaler ici quand une nouvelle version est disponible.
+              <b>latif225/mikhmon-sf-v1:latest</b> et signaler ici quand une nouvelle version est disponible.
             </p>
             <div class="about-update-actions">
-              <a class="btn bg-primary" href="https://github.com/iamabdoulatif/mikhmonv3-safelinkhub" target="_blank" rel="noopener">
+              <a class="btn bg-primary" href="https://github.com/iamabdoulatif/mikhmon-sf-v1" target="_blank" rel="noopener">
                 <i class="fa fa-github"></i> GitHub
               </a>
-              <a class="btn" style="background:#34495e;color:#fff;" href="https://hub.docker.com/r/latif225/mikhmonv3-safelinkhub" target="_blank" rel="noopener">
+              <a class="btn" style="background:#34495e;color:#fff;" href="https://hub.docker.com/r/latif225/mikhmon-sf-v1" target="_blank" rel="noopener">
                 <i class="fa fa-cube"></i> DockerHub
               </a>
             </div>

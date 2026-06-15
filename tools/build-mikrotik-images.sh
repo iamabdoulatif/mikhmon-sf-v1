@@ -11,7 +11,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 OUT="$PROJECT_DIR/docker-output"
 DOCKERFILE="$OUT/Dockerfile.fixed-slim"
-REPO="${REPO:-local/mikhmonv3-safelinkhub}"
+REPO="${REPO:-local/mikhmon-sf-v1}"
 BUILDER="${BUILDER:-safelink-builder}"
 STAMP="${BUILD_STAMP:-$(date -u +%Y%m%d%H%M%S)}"
 VERSION="${BUILD_VERSION:-v3.0.${STAMP}}"
@@ -73,7 +73,7 @@ flatten_image() {
     --change 'EXPOSE 80' \
     --change 'ENTRYPOINT ["php"]' \
     --change 'CMD ["-S", "0.0.0.0:80", "-t", "/src/src/"]' \
-    --change 'LABEL org.opencontainers.image.title="mikhmonv3-safelinkhub"' \
+    --change 'LABEL org.opencontainers.image.title="mikhmon-sf-v1"' \
     --change 'LABEL org.opencontainers.image.description="Mikhmon v3 SafeLink Hub for MikroTik RouterOS containers"' \
     --change "LABEL org.opencontainers.image.version=\"$VERSION\"" \
     --change "LABEL org.opencontainers.image.revision=\"$STAMP\"" \

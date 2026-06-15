@@ -3,9 +3,9 @@ FROM alpine:3.15
 ARG TARGETPLATFORM
 ARG BUILD_VERSION=dev
 ARG BUILD_STAMP=unknown
-ARG IMAGE_NAME=latif225/mikhmonv3-safelinkhub
+ARG IMAGE_NAME=latif225/mikhmon-sf-v1
 
-LABEL org.opencontainers.image.title="mikhmonv3-safelinkhub"
+LABEL org.opencontainers.image.title="mikhmon-sf-v1"
 LABEL org.opencontainers.image.description="Mikhmon V3 SafelinkHub for MikroTik RouterOS containers"
 LABEL org.opencontainers.image.version="${BUILD_VERSION}"
 LABEL org.opencontainers.image.revision="${BUILD_STAMP}"

@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE_NAME: latif225/mikhmonv3-safelinkhub
+  IMAGE_NAME: latif225/mikhmon-sf-v1
   DOCKERFILE: Dockerfile.mikrotik
   DELETE_DOCKERHUB_EXISTING_TAGS: "1"
 
@@ -54,6 +54,6 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-          repository: latif225/mikhmonv3-safelinkhub
+          repository: latif225/mikhmon-sf-v1
           short-description: "Mikhmon v3 pour MikroTik Hotspot: vouchers, revenus, expiration et IP Binding temporise."
           readme-filepath: ./dockerhub/README.md

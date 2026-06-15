@@ -20,7 +20,7 @@ $checks = array(
     'dockerhub username secret' => 'DOCKERHUB_USERNAME',
     'dockerhub token secret' => 'DOCKERHUB_TOKEN',
     'flattened build script' => 'tools/ci-build-push-flattened.sh',
-    'dockerhub repository' => 'latif225/mikhmonv3-safelinkhub',
+    'dockerhub repository' => 'latif225/mikhmon-sf-v1',
     'build timestamp step' => 'BUILD_STAMP=',
     'skopeo install step' => 'sudo apt-get install -y skopeo',
     'qemu setup step' => 'docker/setup-qemu-action@v3',

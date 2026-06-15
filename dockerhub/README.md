@@ -3,7 +3,7 @@
 Image Docker preparee pour administrer un hotspot MikroTik avec Mikhmon: profils, vouchers, vendeurs, revenus, IP Binding temporise et interface plus lisible sur mobile.
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/admin-login-readable.png" alt="Mikhmon SafeLink Hub - page de connexion admin, manager et vendeur" width="720">
+  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/admin-login-readable.png" alt="Mikhmon SafeLink Hub - page de connexion admin, manager et vendeur" width="720">
 </p>
 
 ## Apercus lisibles
@@ -13,25 +13,25 @@ Les captures ci-dessous sont recadrees pour rester lisibles directement dans Doc
 ### Connexion admin, manager et vendeur
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/admin-login-readable.png" alt="Page de connexion Mikhmon avec les onglets Admin, Manager et Vendor" width="720">
+  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/admin-login-readable.png" alt="Page de connexion Mikhmon avec les onglets Admin, Manager et Vendor" width="720">
 </p>
 
 ### Connexion vendeur
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/vendor-login-readable.png" alt="Page Vendor Login Mikhmon recadree pour Docker Hub" width="720">
+  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/vendor-login-readable.png" alt="Page Vendor Login Mikhmon recadree pour Docker Hub" width="720">
 </p>
 
 ### IP Binding mobile
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/mobile-ip-binding-readable.png" alt="Formulaire IP Binding Mikhmon lisible sur mobile" width="520">
+  <img src="https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/mobile-ip-binding-readable.png" alt="Formulaire IP Binding Mikhmon lisible sur mobile" width="520">
 </p>
 
 ## Tag disponible
 
 ```text
-latif225/mikhmonv3-safelinkhub:latest
+latif225/mikhmon-sf-v1:latest
 ```
 
 Le tag `latest` est un manifeste multi-architecture aplati avec `skopeo`.
@@ -58,7 +58,7 @@ DockerHub choisit automatiquement l'image qui correspond au routeur ou au serveu
 ## Utilisation Docker
 
 ```bash
-docker run --rm -p 8080:80 latif225/mikhmonv3-safelinkhub:latest
+docker run --rm -p 8080:80 latif225/mikhmon-sf-v1:latest
 ```
 
 Ouvrir ensuite:
@@ -84,7 +84,7 @@ Exemple container:
 
 ```routeros
 /container/config/set registry-url=https://registry-1.docker.io tmpdir=/tmp
-/container/add remote-image=latif225/mikhmonv3-safelinkhub:latest check-certificate=no root-dir=/flash/mikhmon-root name=mikhmon interface=MIKHMON logging=yes start-on-boot=yes
+/container/add remote-image=latif225/mikhmon-sf-v1:latest check-certificate=no root-dir=/flash/mikhmon-root name=mikhmon interface=MIKHMON logging=yes start-on-boot=yes
 /container/start [find name="mikhmon"]
 ```
 

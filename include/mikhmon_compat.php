@@ -889,6 +889,67 @@ if (!function_exists('mikhmon_month_map')) {
       . '}';
   }
 
+  function mikhmon_expire_action_for_mode($expmode)
+  {
+    if ($expmode === 'rem' || $expmode === 'remc') {
+      return 'remove';
+    }
+    if ($expmode === 'ntf' || $expmode === 'ntfc') {
+      return 'set limit-uptime=1s';
+    }
+    return '';
+  }
+
+  function mikhmon_validate_hotspot_profile_expiry($expmode, $validity)
+  {
+    $expmode = trim((string) $expmode);
+    $validity = trim((string) $validity);
+    $validModes = array('0', 'rem', 'ntf', 'remc', 'ntfc');
+    if (!in_array($expmode, $validModes, true)) {
+      return array('ok' => false, 'error' => 'Invalid expiration mode.', 'expmode' => '', 'validity' => '');
+    }
+
+    if ($expmode === '0') {
+      return array('ok' => true, 'error' => '', 'expmode' => '0', 'validity' => '');
+    }
+
+    $normalizedValidity = mikhmon_normalize_routeros_duration($validity);
+    if ($normalizedValidity === '') {
+      return array('ok' => false, 'error' => 'Invalid validity duration.', 'expmode' => $expmode, 'validity' => '');
+    }
+
+    return array('ok' => true, 'error' => '', 'expmode' => $expmode, 'validity' => $normalizedValidity);
+  }
+
+  function mikhmon_expiry_comment_is_expired($comment, $nowDateIso = '', $nowTime = '')
+  {
+    $comment = trim((string) $comment);
+    if ($comment === '') {
+      return false;
+    }
+
+    $expiryIso = '';
+    $expiryTime = '';
+    if (preg_match('/^([a-z]{3})\/(\d{2})\/(\d{4})\s+(\d{2}:\d{2}:\d{2})/i', $comment, $matches)) {
+      $months = array_flip(mikhmon_month_map());
+      $month = strtolower($matches[1]);
+      if (!isset($months[$month])) {
+        return false;
+      }
+      $expiryIso = $matches[3] . '-' . $months[$month] . '-' . $matches[2];
+      $expiryTime = $matches[4];
+    } elseif (preg_match('/^(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/', $comment, $matches)) {
+      $expiryIso = $matches[1];
+      $expiryTime = $matches[2];
+    } else {
+      return false;
+    }
+
+    $nowDateIso = mikhmon_accounting_iso_date($nowDateIso, date('Y-m-d'));
+    $nowTime = mikhmon_accounting_settlement_time($nowTime, date('H:i:s'));
+    return ($expiryIso . ' ' . $expiryTime) <= ($nowDateIso . ' ' . $nowTime);
+  }
+
   function mikhmon_profile_validity_from_on_login($onLogin)
   {
     $parts = explode(',', (string) $onLogin);

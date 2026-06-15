@@ -20,11 +20,11 @@ if ($workflow === false) {
 }
 
 $requiredReadmeSnippets = [
-    'https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/admin-login-readable.png',
-    'https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/vendor-login-readable.png',
-    'https://raw.githubusercontent.com/iamabdoulatif/mikhmonv3-safelinkhub/main/dockerhub/assets/mobile-ip-binding-readable.png',
+    'https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/admin-login-readable.png',
+    'https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/vendor-login-readable.png',
+    'https://raw.githubusercontent.com/iamabdoulatif/mikhmon-sf-v1/main/dockerhub/assets/mobile-ip-binding-readable.png',
     'width="720"',
-    'latif225/mikhmonv3-safelinkhub:latest',
+    'latif225/mikhmon-sf-v1:latest',
     'manifeste multi-architecture',
     'skopeo',
 ];
@@ -39,7 +39,7 @@ if (strpos($readme, 'mikhmon-dockerhub-assets') !== false) {
     $failures[] = 'DockerHub README still references the old external screenshot repository.';
 }
 
-if (strpos($readme, 'latif225/mikhmonv3-safelinkhub:v1') !== false) {
+if (strpos($readme, 'latif225/mikhmon-sf-v1:v1') !== false) {
     $failures[] = 'DockerHub README must not advertise the legacy v1 tag.';
 }
 
@@ -69,7 +69,7 @@ foreach ($requiredAssets as $asset => [$minWidth, $minHeight]) {
 
 $requiredWorkflowSnippets = [
     'peter-evans/dockerhub-description@v4',
-    'repository: latif225/mikhmonv3-safelinkhub',
+    'repository: latif225/mikhmon-sf-v1',
     'readme-filepath: ./dockerhub/README.md',
     'short-description: "Mikhmon v3 pour MikroTik Hotspot',
 ];

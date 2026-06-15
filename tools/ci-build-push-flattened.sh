@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_NAME="${IMAGE_NAME:-latif225/mikhmonv3-safelinkhub}"
+IMAGE_NAME="${IMAGE_NAME:-latif225/mikhmon-sf-v1}"
 DOCKERFILE="${DOCKERFILE:-Dockerfile.mikrotik}"
 BUILD_STAMP="${BUILD_STAMP:-$(date -u +%Y%m%d%H%M%S)}"
 BUILD_VERSION="${BUILD_VERSION:-v3.0.${BUILD_STAMP}}"
@@ -226,8 +226,8 @@ build_flat_image() {
     --change 'CMD ["-S","0.0.0.0:80","-t","/src/src/"]' \
     --change 'WORKDIR /src' \
     --change 'EXPOSE 80' \
-    --change "LABEL org.opencontainers.image.title=mikhmonv3-safelinkhub" \
-    --change "LABEL org.opencontainers.image.description=Mikhmon-V3-SafelinkHub-for-MikroTik-RouterOS-containers" \
+    --change "LABEL org.opencontainers.image.title=mikhmon-sf-v1" \
+    --change "LABEL org.opencontainers.image.description=Mikhmon-SF-V1-for-MikroTik-RouterOS-containers" \
     --change "LABEL org.opencontainers.image.version=${BUILD_VERSION}" \
     --change "LABEL org.opencontainers.image.revision=${BUILD_STAMP}" \
     - "$flat_tag" >/dev/null

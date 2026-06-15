@@ -23,6 +23,8 @@ include_once(__DIR__ . '/../include/csrf.php');
 if (!isset($_SESSION["mikhmon"])) {
   header("Location:../admin.php?id=login");
 } else {
+  $monid = "";
+  $profileError = "";
 
   $getallqueue = $API->comm("/queue/simple/print", array(
     "?dynamic" => "false",
@@ -37,10 +39,15 @@ if (!isset($_SESSION["mikhmon"])) {
     $ratelimit = ($_POST['ratelimit']);
     $expmode = ($_POST['expmode']);
     $validity = ($_POST['validity']);
-    $graceperiod = ($_POST['graceperiod']);
     $getprice = ($_POST['price']);
     $getsprice = ($_POST['sprice']);
     $addrpool = ($_POST['ppool']);
+    $expiryValidation = mikhmon_validate_hotspot_profile_expiry($expmode, $validity);
+    if (!$expiryValidation['ok']) {
+      $profileError = $expiryValidation['error'];
+    } else {
+      $expmode = $expiryValidation['expmode'];
+      $validity = $expiryValidation['validity'];
     if ($getprice == "") {
       $price = "0";
     } else {
@@ -66,15 +73,7 @@ if (!isset($_SESSION["mikhmon"])) {
     $record = mikhmon_build_record_script($price, $validity, $name);
     $onlogin = mikhmon_build_on_login_script($expmode, $price, $validity, $sprice, $getlock, $record, $lock);
 
-    if ($expmode == "rem") {
-      $mode = "remove";
-    } elseif ($expmode == "ntf") {
-      $mode = "set limit-uptime=1s";
-    } elseif ($expmode == "remc") {
-      $mode = "remove";
-    } elseif ($expmode == "ntfc") {
-      $mode = "set limit-uptime=1s";
-    }
+    $mode = mikhmon_expire_action_for_mode($expmode);
 
     $bgservice = mikhmon_build_expire_monitor_script($name, $mode);
 
@@ -90,8 +89,8 @@ if (!isset($_SESSION["mikhmon"])) {
       "parent-queue" => "$parent",
     ));
 
-    if($expmode != "0"){
-      if (empty($monid)){
+	    if($expmode != "0"){
+	      if (empty($monid)){
         $API->comm("/system/scheduler/add", array(
           "name" => "$name",
           "start-time" => "$randstarttime",
@@ -110,16 +109,17 @@ if (!isset($_SESSION["mikhmon"])) {
         "disabled" => "no",
         "comment" => "Monitor Profile $name",
         ));
-      }}else{
-        $API->comm("/system/scheduler/remove", array(
-          ".id" => "$monid"));
-      }
+	      }}elseif (!empty($monid)){
+	        $API->comm("/system/scheduler/remove", array(
+	          ".id" => "$monid"));
+	      }
 
     $getprofile = $API->comm("/ip/hotspot/user/profile/print", array(
       "?name" => "$name",
     ));
     $pid = $getprofile[0]['.id'];
     echo "<script>window.location='./?user-profile=" . $pid . "&session=" . $session . "'</script>";
+    }
   }
 }
 ?>
@@ -132,6 +132,7 @@ if (!isset($_SESSION["mikhmon"])) {
   <div class="card-body">
 <form autocomplete="off" method="post" action="">
   <?= csrf_field() ?>
+  <?php if ($profileError !== "") { ?><div class="alert bg-danger"><?= htmlspecialchars($profileError, ENT_QUOTES, 'UTF-8') ?></div><?php } ?>
   <div>
     <a class="btn bg-warning" href="./?hotspot=user-profiles&session=<?= $session; ?>"> <i class="fa fa-close btn-mrg"></i> <?= $_close ?></a>
     <button type="submit" name="save" class="btn bg-primary btn-mrg" ><i class="fa fa-save btn-mrg"></i> <?= $_save ?></button>
@@ -174,9 +175,6 @@ if (!isset($_SESSION["mikhmon"])) {
   </tr>
   <tr id="validity" style="display:none;">
     <td class="align-middle"><?= $_validity ?></td><td><input class="form-control" type="text" id="validi" size="4" autocomplete="off" name="validity" value="" required="1"></td>
-  </tr>
-  <tr id="graceperiod" style="display:none;">
-    <td class="align-middle"><?= $_grace_period ?></td><td><input class="form-control" type="text" id="gracepi" size="4" autocomplete="off" name="graceperiod" placeholder="5m" value="5m" required="1"></td>
   </tr>
   <tr>
     <td class="align-middle"><?= $_price.' '.$currency; ?></td><td><input class="form-control" type="text" size="10" min="0" name="price" value="" ></td>

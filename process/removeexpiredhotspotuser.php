@@ -18,12 +18,26 @@
 session_start();
 // hide all error
 error_reporting(0);
-$getuser = $API->comm("/ip/hotspot/user/print", array(
-  "?limit-uptime" => "1s",
-));
+include_once(__DIR__ . '/../include/mikhmon_compat.php');
+
+$clockRows = $API->comm("/system/clock/print");
+$clock = isset($clockRows[0]) ? $clockRows[0] : array();
+$nowDisplay = mikhmon_router_clock_display($clock, $_SESSION['timezone'] ?? 'UTC');
+$nowDate = substr($nowDisplay, 0, 10);
+$nowTime = substr($nowDisplay, 11, 8);
+
+$allUsers = $API->comm("/ip/hotspot/user/print");
+$getuser = array();
+foreach ($allUsers as $candidate) {
+  $limitUptime = isset($candidate['limit-uptime']) ? trim((string) $candidate['limit-uptime']) : '';
+  $comment = isset($candidate['comment']) ? $candidate['comment'] : '';
+  if ($limitUptime === '1s' || mikhmon_expiry_comment_is_expired($comment, $nowDate, $nowTime)) {
+    $getuser[] = $candidate;
+  }
+}
 $TotalReg = count($getuser);
 
-$_SESSION['ubp'] = $getuser[0]['profile'];
+$_SESSION['ubp'] = isset($getuser[0]['profile']) ? $getuser[0]['profile'] : "";
 $_SESSION['ubc'] = "";
 
 for ($i = 0; $i < $TotalReg; $i++) {

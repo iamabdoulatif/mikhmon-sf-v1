@@ -37,7 +37,7 @@ if (!function_exists('mikhmon_update_cache_file')) {
     $info = array(
       'version' => getenv('MIKHMON_BUILD_VERSION') ?: '',
       'stamp' => getenv('MIKHMON_BUILD_STAMP') ?: '',
-      'image' => getenv('MIKHMON_IMAGE_NAME') ?: 'latif225/mikhmonv3-safelinkhub',
+      'image' => getenv('MIKHMON_IMAGE_NAME') ?: 'latif225/mikhmon-sf-v1',
     );
 
     $buildFile = dirname(__DIR__) . '/build-info.json';

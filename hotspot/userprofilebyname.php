@@ -22,6 +22,7 @@ include_once(__DIR__ . '/../include/mikhmon_compat.php');
 if (!isset($_SESSION["mikhmon"])) {
   header("Location:../admin.php?id=login");
 } else {
+  $profileError = "";
 
 
   if (substr($userprofile, 0, 1) == "*") {
@@ -84,8 +85,6 @@ if (!isset($_SESSION["mikhmon"])) {
 
   $getvalid = explode(",", $ponlogin)[3];
 
-  $getgracep = explode(",", $ponlogin)[4];
-
   $getlocku = explode(",", $ponlogin)[6];
   if ($getlocku == "") {
     $getlocku = "Disable";
@@ -112,10 +111,15 @@ if (!isset($_SESSION["mikhmon"])) {
     $ratelimit = ($_POST['ratelimit']);
     $expmode = ($_POST['expmode']);
     $validity = ($_POST['validity']);
-    $graceperiod = ($_POST['graceperiod']);
     $getprice = ($_POST['price']);
     $getsprice = ($_POST['sprice']);
     $addrpool = ($_POST['ppool']);
+    $expiryValidation = mikhmon_validate_hotspot_profile_expiry($expmode, $validity);
+    if (!$expiryValidation['ok']) {
+      $profileError = $expiryValidation['error'];
+    } else {
+      $expmode = $expiryValidation['expmode'];
+      $validity = $expiryValidation['validity'];
     if ($getprice == "") {
       $price = "0";
     } else {
@@ -141,15 +145,7 @@ if (!isset($_SESSION["mikhmon"])) {
     $record = mikhmon_build_record_script($price, $validity, $name);
     $onlogin = mikhmon_build_on_login_script($expmode, $price, $validity, $sprice, $getlock, $record, $lock);
 
-    if ($expmode == "rem") {
-      $mode = "remove";
-    } elseif ($expmode == "ntf") {
-      $mode = "set limit-uptime=1s";
-    } elseif ($expmode == "remc") {
-      $mode = "remove";
-    } elseif ($expmode == "ntfc") {
-      $mode = "set limit-uptime=1s";
-    }
+    $mode = mikhmon_expire_action_for_mode($expmode);
 
     $bgservice = mikhmon_build_expire_monitor_script($name, $mode);
     
@@ -186,12 +182,13 @@ if (!isset($_SESSION["mikhmon"])) {
       "disabled" => "no",
       "comment" => "Monitor Profile $name",
       ));
-    }}else{
+    }}elseif (!empty($monid)){
       $API->comm("/system/scheduler/remove", array(
         ".id" => "$monid"));
     }
 
     echo "<script>window.location='./?user-profile=" . $pid . "&session=" . $session . "'</script>";
+    }
   }
 }
 ?>
@@ -203,6 +200,7 @@ if (!isset($_SESSION["mikhmon"])) {
 </div>
 <div class="card-body">
 <form autocomplete="off" method="post" action="">
+  <?php if ($profileError !== "") { ?><div class="alert bg-danger"><?= htmlspecialchars($profileError, ENT_QUOTES, 'UTF-8') ?></div><?php } ?>
   <div>
     <a class="btn bg-warning" href="./?hotspot=user-profiles&session=<?= $session; ?>"> <i class="fa fa-close"></i> <?= $_close?></a>
     <button type="submit" name="save" class="btn bg-primary" ><i class="fa fa-save"></i> <?= $_save ?></button>
