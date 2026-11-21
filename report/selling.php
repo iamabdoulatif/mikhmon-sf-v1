@@ -25,8 +25,18 @@ if (!isset($_SESSION["mikhmon"])) {
 
 	$idhr = $_GET['idhr'];
 	$idbl = $_GET['idbl'];
+	// Filtre par intervalle de dates (from/to = YYYY-MM-DD)
+	$srange = mikhmon_sale_range(isset($_GET['from']) ? $_GET['from'] : '', isset($_GET['to']) ? $_GET['to'] : '');
+	$rfrom = $rto = '';
+	if ($srange) {
+		list($rfrom, $rto) = $srange;
+		$idhr = '';
+		$idbl = '';
+	}
 	$idbl2 = explode("/",$idhr)[0].explode("/",$idhr)[2];
-	if ($idhr != ""){
+	if ($srange){
+		$_SESSION['report'] = "&from=".$rfrom."&to=".$rto;
+	} elseif ($idhr != ""){
 		$_SESSION['report'] = "&idhr=".$idhr;
 	} elseif ($idbl != ""){
 		$_SESSION['report'] = "&idbl=".$idbl;
@@ -80,7 +90,19 @@ if (!isset($_SESSION["mikhmon"])) {
 	} else {
 		$fprefix = "";
 	}
-	if (strlen($idhr) > "0") {
+	if ($srange) {
+		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
+		$getData = array();
+		foreach (mikhmon_sale_range_owners($rfrom, $rto) as $o) {
+			$getData = array_merge($getData, (array) mikhmon_fetch_sales_by_month($API, $o));
+		}
+		$getData = mikhmon_filter_sales_range($getData, $rfrom, $rto);
+		$TotalReg = count($getData);
+		}
+		$filedownload = $rfrom . "_" . $rto;
+		$shf = "hidden";
+		$shd = "none";
+	} elseif (strlen($idhr) > "0") {
 		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
 			$getData = mikhmon_fetch_sales_by_day($API, $idhr);
 			$TotalReg = count($getData);
@@ -248,7 +270,7 @@ $(document).ready(function(){
 <div class="col-12">
 <div class="card">
 <div class="card-header">
-	<h3><i class=" fa fa-money"></i> <?= $_selling_report ?> <?= ucfirst($idhr) . ucfirst(substr($idbl,0,3).' '.substr($idbl,3,5));	if ($prefix != "") {echo " prefix [" . $prefix . "]";} ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3>
+	<h3><i class=" fa fa-money"></i> <?= $_selling_report ?> <?= ($srange ? date('d/m/Y', strtotime($rfrom)) . ' &rarr; ' . date('d/m/Y', strtotime($rto)) : '') . ucfirst($idhr) . ucfirst(substr($idbl,0,3).' '.substr($idbl,3,5));	if ($prefix != "") {echo " prefix [" . $prefix . "]";} ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3>
 </div>
 <div class="card-body">
 <div class="row">
@@ -259,7 +281,7 @@ $(document).ready(function(){
 		  <button name="help" class="btn bg-primary" onclick="location.href='#help';" title="Help"><i class="fa fa-question"></i> <?= $_help ?></button>
 		  <button class="btn bg-primary" onclick="exportTableToCSV('report-mikhmon-<?= $filedownload . $fprefix; ?>.csv')" title="Download selling report"><i class="fa fa-download"></i> CSV</button>
 			<button class="btn bg-primary" onclick="location.href='./?report=selling&session=<?= $session; ?>';" title="Reload all data"><i class="fa fa-search"></i> <?= $_all ?></button>
-			<?php if(!empty($idbl)){echo '<button name="resume" id="openResume" class="btn bg-primary"title="Resume Report"><i class="fa fa-area-chart"></i> '.$_resume.'</button>';}else{
+			<?php if(!empty($idbl)){echo '<button name="resume" id="openResume" class="btn bg-primary"title="Resume Report"><i class="fa fa-area-chart"></i> '.$_resume.'</button>';}elseif(!$srange){
 				echo '<a class="btn bg-primary" href="./?report=selling&idbl='.$idbl2.'&session='.$session.'" title="Show '.ucfirst(substr($idbl2,0,3).' '.substr($idbl2,3,5)).'"><i class="fa fa-search"></i> '.ucfirst(substr($idbl2,0,3).' '.substr($idbl2,3,5)).'</a>';}?>
 		  <button name="print" class="btn bg-primary" onclick="window.open('./report/print.php?<?= explode("?report=selling&",$url)[1] ?>','_blank');" title="Print"><i class="fa fa-print"></i> <?= $_print ?></button>
 		  <button style="display: <?= $shd; ?>;" name="remdata" class="btn bg-danger" onclick="location.href='#remdata';" title="Delete Data <?= $filedownload; ?>"><i class="fa fa-trash"></i> <?= $_delete_data.' '. $filedownload; ?></button>
@@ -350,6 +372,27 @@ $(document).ready(function(){
 						window.location='./?report=selling&idbl='+M+Y+'&prefix='+X+'&session=<?= $session; ?>';
 					}
 					
+				}
+			</script>
+		</div>
+		<div class="input-group mr-b-10">
+			<div class="input-group-2 col-box-4">
+				<input type="date" style="padding:4px;" class="group-item group-item-l" title="Du" id="RF" value="<?= $rfrom ?>">
+			</div>
+			<div class="input-group-2 col-box-4">
+				<input type="date" style="padding:4px;" class="group-item group-item-md" title="Au" id="RT" value="<?= $rto ?>">
+			</div>
+			<div class="input-group-2 col-box-4">
+				<div style="padding:3.5px;" class="group-item group-item-r text-center pointer" onclick="filterRange();" title="Revenu cumulé sur la période"><i class="fa fa-calendar"></i> Période</div>
+			</div>
+			<script type="text/javascript">
+				function filterRange(){
+					var F = document.getElementById('RF').value;
+					var T = document.getElementById('RT').value;
+					var X = document.getElementById('filterTable').value;
+					if (F === "" || T === "") { alert("Choisissez une date de début et une date de fin"); return; }
+					loader();
+					window.location='./?report=selling&from='+F+'&to='+T+'&prefix='+encodeURIComponent(X)+'&session=<?= $session; ?>';
 				}
 			</script>
 		</div>

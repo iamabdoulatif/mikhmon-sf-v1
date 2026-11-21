@@ -1066,3 +1066,70 @@ if (!function_exists('mikhmon_month_map')) {
     return (int)$result;
   }
 }
+
+/**
+ * Filtre des ventes par intervalle de dates (rapport de vente "Du ... au ...").
+ * $from / $to : dates YYYY-MM-DD issues d'un <input type="date">.
+ */
+if (!function_exists('mikhmon_sale_ymd')) {
+  // Date de vente (mmm/dd/yyyy ou YYYY-MM-DD) -> "YYYYMMDD", '' si illisible.
+  function mikhmon_sale_ymd($raw)
+  {
+    $raw = trim((string) $raw);
+    if (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $raw, $m)) {
+      return $m[1] . $m[2] . $m[3];
+    }
+    if (preg_match('/^([a-z]{3})[\/-](\d{1,2})[\/-](\d{4})$/i', $raw, $m)) {
+      $i = array_search(strtolower($m[1]), array('jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'));
+      if ($i === false) {
+        return '';
+      }
+      return $m[3] . sprintf('%02d%02d', $i + 1, $m[2]);
+    }
+    return '';
+  }
+
+  // Valide l'intervalle ; retourne array(from, to) triés ou false.
+  function mikhmon_sale_range($from, $to)
+  {
+    $ok = '/^\d{4}-\d{2}-\d{2}$/';
+    if (!preg_match($ok, (string) $from) || !preg_match($ok, (string) $to)) {
+      return false;
+    }
+    if (strtotime($from) === false || strtotime($to) === false) {
+      return false;
+    }
+    return ($from <= $to) ? array($from, $to) : array($to, $from);
+  }
+
+  // Clés mensuelles Mikhmon (nov2026, dec2026...) couvertes par l'intervalle.
+  function mikhmon_sale_range_owners($from, $to)
+  {
+    $owners = array();
+    $cur = strtotime(substr($from, 0, 7) . '-01');
+    $end = strtotime(substr($to, 0, 7) . '-01');
+    // ponytail: plafond 60 mois pour éviter une boucle d'appels API sans fin.
+    for ($n = 0; $cur <= $end && $n < 60; $n++) {
+      $owners[] = strtolower(date('M', $cur)) . date('Y', $cur);
+      $cur = strtotime('+1 month', $cur);
+    }
+    return $owners;
+  }
+
+  // Garde uniquement les ventes dont la date est dans [from, to].
+  function mikhmon_filter_sales_range($rows, $from, $to)
+  {
+    $f = str_replace('-', '', $from);
+    $t = str_replace('-', '', $to);
+    $out = array();
+    foreach ((array) $rows as $row) {
+      $name = isset($row['name']) ? $row['name'] : '';
+      $parts = explode('-|-', $name);
+      $d = mikhmon_sale_ymd(isset($parts[0]) && $parts[0] !== '' ? $parts[0] : (isset($row['source']) ? $row['source'] : ''));
+      if ($d !== '' && $d >= $f && $d <= $t) {
+        $out[] = $row;
+      }
+    }
+    return $out;
+  }
+}

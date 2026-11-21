@@ -42,8 +42,18 @@ if (!isset($_SESSION["mikhmon"])) {
 
 	$idhr = $_GET['idhr'];
 	$idbl = $_GET['idbl'];
+	// Filtre par intervalle de dates (from/to = YYYY-MM-DD)
+	$srange = mikhmon_sale_range(isset($_GET['from']) ? $_GET['from'] : '', isset($_GET['to']) ? $_GET['to'] : '');
+	$rfrom = $rto = '';
+	if ($srange) {
+		list($rfrom, $rto) = $srange;
+		$idhr = '';
+		$idbl = '';
+	}
 	$idbl2 = explode("/",$idhr)[0].explode("/",$idhr)[2];
-	if ($idhr != ""){
+	if ($srange){
+		$_SESSION['report'] = "&from=".$rfrom."&to=".$rto;
+	} elseif ($idhr != ""){
 		$_SESSION['report'] = "&idhr=".$idhr;
 	} elseif ($idbl != ""){
 		$_SESSION['report'] = "&idbl=".$idbl;
@@ -106,7 +116,19 @@ if (!isset($_SESSION["mikhmon"])) {
 	} else {
 		$fprefix = "";
 	}
-	if (strlen($idhr) > "0") {
+	if ($srange) {
+		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
+		$getData = array();
+		foreach (mikhmon_sale_range_owners($rfrom, $rto) as $o) {
+			$getData = array_merge($getData, (array) mikhmon_fetch_sales_by_month($API, $o));
+		}
+		$getData = mikhmon_filter_sales_range($getData, $rfrom, $rto);
+		$TotalReg = count($getData);
+		}
+		$filedownload = $rfrom . "_" . $rto;
+		$shf = "hidden";
+		$shd = "none";
+	} elseif (strlen($idhr) > "0") {
 		if ($API->connect($iphost, $userhost, decrypt($passwdhost))) {
 			$getData = mikhmon_fetch_sales_by_day($API, $idhr);
 			$TotalReg = count($getData);
