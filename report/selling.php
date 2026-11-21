@@ -34,6 +34,11 @@ if (!isset($_SESSION["mikhmon"])) {
 		$idbl = '';
 	}
 	$idbl2 = explode("/",$idhr)[0].explode("/",$idhr)[2];
+	// Filtre par vendeur (?seller=<identifiant>) : commentaire du ticket terminé par -<vendeur>
+	if (!isset($sellers_data)) { include(__DIR__ . '/../include/sellers_config.php'); }
+	$sseller = isset($_GET['seller']) ? trim((string) $_GET['seller']) : '';
+	if (!isset($sellers_data) || !is_array($sellers_data) || !isset($sellers_data[$sseller])) { $sseller = ''; }
+	$ssellerName = $sseller !== '' ? (isset($sellers_data[$sseller]['name']) ? $sellers_data[$sseller]['name'] : $sseller) : '';
 	if ($srange){
 		$_SESSION['report'] = "&from=".$rfrom."&to=".$rto;
 	} elseif ($idhr != ""){
@@ -136,6 +141,12 @@ if (!isset($_SESSION["mikhmon"])) {
 		$filedownload = $idbl;
 		$shf = "hidden";
 		$shd = "inline-block";
+	}
+	if ($sseller !== '' && isset($getData)) {
+		$getData = mikhmon_filter_sales_seller($getData, $sseller, $sellers_data);
+		$TotalReg = count($getData);
+		$filedownload .= "-" . $sseller;
+		$shd = "none"; // ne pas proposer de supprimer tout le mois depuis la vue d'un vendeur
 	}
 	
 }
@@ -255,6 +266,8 @@ function number_format(number, decimals, dec_point, thousands_sep) {
         td.appendChild(document.createTextNode(i + 1));
         rows[i].insertBefore(td, rows[i].firstChild);
     }
+    var nb = document.getElementById('nbtickets');
+    if (nb) nb.innerHTML = rows.length;
         }
 		</script>
 
@@ -270,7 +283,7 @@ $(document).ready(function(){
 <div class="col-12">
 <div class="card">
 <div class="card-header">
-	<h3><i class=" fa fa-money"></i> <?= $_selling_report ?> <?= ($srange ? date('d/m/Y', strtotime($rfrom)) . ' &rarr; ' . date('d/m/Y', strtotime($rto)) : '') . ucfirst($idhr) . ucfirst(substr($idbl,0,3).' '.substr($idbl,3,5));	if ($prefix != "") {echo " prefix [" . $prefix . "]";} ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3>
+	<h3><i class=" fa fa-money"></i> <?= $_selling_report ?> <?= ($srange ? date('d/m/Y', strtotime($rfrom)) . ' &rarr; ' . date('d/m/Y', strtotime($rto)) : '') . ucfirst($idhr) . ucfirst(substr($idbl,0,3).' '.substr($idbl,3,5));	if ($prefix != "") {echo " prefix [" . $prefix . "]";} if ($sseller !== '') {echo " &mdash; " . htmlspecialchars($ssellerName);} ?> <small id="loader" style="display: none;" ><i><i class='fa fa-circle-o-notch fa-spin'></i> <?= $_processing ?> </i></small></h3>
 </div>
 <div class="card-body">
 <div class="row">
@@ -367,22 +380,30 @@ $(document).ready(function(){
 					var X = document.getElementById('filterTable').value;
 
 					if(D !== ""){
-						window.location='./?report=selling&idhr='+M+'/'+D+'/'+Y+'&prefix='+X+'&session=<?= $session; ?>';
+						window.location='./?report=selling&idhr='+M+'/'+D+'/'+Y+'&prefix='+X+'&seller='+encodeURIComponent(document.getElementById('SV').value)+'&session=<?= $session; ?>';
 					}else if(D === ""){
-						window.location='./?report=selling&idbl='+M+Y+'&prefix='+X+'&session=<?= $session; ?>';
+						window.location='./?report=selling&idbl='+M+Y+'&prefix='+X+'&seller='+encodeURIComponent(document.getElementById('SV').value)+'&session=<?= $session; ?>';
 					}
 					
 				}
 			</script>
 		</div>
 		<div class="input-group mr-b-10">
-			<div class="input-group-2 col-box-4">
+			<div class="input-group-2 col-box-3">
 				<input type="date" style="padding:4px;" class="group-item group-item-l" title="Du" id="RF" value="<?= $rfrom ?>">
 			</div>
-			<div class="input-group-2 col-box-4">
+			<div class="input-group-2 col-box-3">
 				<input type="date" style="padding:4px;" class="group-item group-item-md" title="Au" id="RT" value="<?= $rto ?>">
 			</div>
-			<div class="input-group-2 col-box-4">
+			<div class="input-group-2 col-box-3">
+				<select style="padding:5px;" class="group-item group-item-md" title="Vendeur" id="SV">
+					<option value="">Tous les vendeurs</option>
+					<?php if (isset($sellers_data) && is_array($sellers_data)) { foreach ($sellers_data as $sk => $sd) { ?>
+					<option value="<?= htmlspecialchars($sk) ?>"<?= $sk === $sseller ? ' selected' : '' ?>><?= htmlspecialchars(isset($sd['name']) ? $sd['name'] : $sk) ?></option>
+					<?php } } ?>
+				</select>
+			</div>
+			<div class="input-group-2 col-box-3">
 				<div style="padding:3.5px;" class="group-item group-item-r text-center pointer" onclick="filterRange();" title="Revenu cumulé sur la période"><i class="fa fa-calendar"></i> Période</div>
 			</div>
 			<script type="text/javascript">
@@ -392,7 +413,7 @@ $(document).ready(function(){
 					var X = document.getElementById('filterTable').value;
 					if (F === "" || T === "") { alert("Choisissez une date de début et une date de fin"); return; }
 					loader();
-					window.location='./?report=selling&from='+F+'&to='+T+'&prefix='+encodeURIComponent(X)+'&session=<?= $session; ?>';
+					window.location='./?report=selling&from='+F+'&to='+T+'&prefix='+encodeURIComponent(X)+'&seller='+encodeURIComponent(document.getElementById('SV').value)+'&session=<?= $session; ?>';
 				}
 			</script>
 		</div>
@@ -400,7 +421,7 @@ $(document).ready(function(){
 			<table id="dataTable" class="table table-bordered table-hover text-nowrap">
 				<thead class="thead-light">
 				<tr>
-				  <th colspan=5 ><?= $_selling_report ?> <?= $filedownload . $fprefix; ?><b style="font-size:0;">,,,,</b></th>
+				  <th colspan=5 ><?= $_selling_report ?> <?= $filedownload . $fprefix; ?> &middot; <span id="nbtickets"></span> tickets vendus<b style="font-size:0;">,,,,</b></th>
 				  <th style="text-align:right;"><?= $_total ?></th>
 				  <th style="text-align:right;" id="total"></th>
 				</tr>

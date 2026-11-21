@@ -16,4 +16,15 @@ $rows = array(
 );
 $f = mikhmon_filter_sales_range($rows, '2026-11-21', '2026-11-30');
 assert(count($f) === 2 && strpos($f[0]['name'], 'nov/21') === 0 && strpos($f[1]['name'], '2026-11-30') === 0);
+$sellers = array('alpha' => array('name' => 'Alpha'), 'beta' => array('name' => 'Beta'));
+$sales = array(
+  array('name' => 'nov/12/2026-|-08:00-|-1j1-|-200-|-ip-|-mac-|-1d-|-01-JOUR-|-vc-813-10.12.26-alpha'),
+  array('name' => 'nov/12/2026-|-09:00-|-1j2-|-500-|-ip-|-mac-|-4d-|-04-JOURS-|-vc-307-10.30.26-beta'),
+  array('name' => 'nov/13/2026-|-10:00-|-1j3-|-200-|-ip-|-mac-|-1d-|-01-JOUR-|-vc-813-10.12.26-alpha'),
+  array('name' => 'nov/13/2026-|-11:00-|-1j4-|-700-|-ip-|-mac-|-7d-|-01-SEMAINE-|-vc-226-10.25.26'),
+);
+$a = mikhmon_filter_sales_seller($sales, 'alpha', $sellers);
+assert(count($a) === 2 && mikhmon_sales_total($a) == 400.0);
+assert(count(mikhmon_filter_sales_seller($sales, 'beta', $sellers)) === 1);
+assert(mikhmon_sales_total($sales) == 1600.0);
 echo "OK\n";

@@ -51,6 +51,11 @@ if (!isset($_SESSION["mikhmon"])) {
 		$idbl = '';
 	}
 	$idbl2 = explode("/",$idhr)[0].explode("/",$idhr)[2];
+	// Filtre par vendeur (?seller=<identifiant>) : commentaire du ticket terminé par -<vendeur>
+	if (!isset($sellers_data)) { include(__DIR__ . '/../include/sellers_config.php'); }
+	$sseller = isset($_GET['seller']) ? trim((string) $_GET['seller']) : '';
+	if (!isset($sellers_data) || !is_array($sellers_data) || !isset($sellers_data[$sseller])) { $sseller = ''; }
+	$ssellerName = $sseller !== '' ? (isset($sellers_data[$sseller]['name']) ? $sellers_data[$sseller]['name'] : $sseller) : '';
 	if ($srange){
 		$_SESSION['report'] = "&from=".$rfrom."&to=".$rto;
 	} elseif ($idhr != ""){
@@ -162,6 +167,12 @@ if (!isset($_SESSION["mikhmon"])) {
 		$filedownload = $idbl;
 		$shf = "hidden";
 		$shd = "inline-block";
+	}
+	if ($sseller !== '' && isset($getData)) {
+		$getData = mikhmon_filter_sales_seller($getData, $sseller, $sellers_data);
+		$TotalReg = count($getData);
+		$filedownload .= "-" . $sseller;
+		$shd = "none"; // ne pas proposer de supprimer tout le mois depuis la vue d'un vendeur
 	}
 	
 }
@@ -300,6 +311,8 @@ function number_format(number, decimals, dec_point, thousands_sep) {
         td.appendChild(document.createTextNode(i + 1));
         rows[i].insertBefore(td, rows[i].firstChild);
     }
+    var nb = document.getElementById('nbtickets');
+    if (nb) nb.innerHTML = rows.length;
         
     window.print();
         }
@@ -312,7 +325,7 @@ function number_format(number, decimals, dec_point, thousands_sep) {
 			<table id="dataTable" class="table table-bordered table-hover text-nowrap">
 				<thead><tr><th colspan="7"><?= "<h3>".$_selling_report."</h3>". $hotspotname ?></th></tr></thead>
 				<tr>
-				  <th style="text-align:left;" colspan=5 ><?= $_selling_report ?> <?= $trange.$filedownload . $fprefix; ?><b style="font-size:0;">,,,</b></th>
+				  <th style="text-align:left;" colspan=5 ><?= $_selling_report ?> <?= $trange.$filedownload . $fprefix; ?><?= $sseller !== '' ? ' &mdash; ' . htmlspecialchars($ssellerName) : '' ?> &middot; <span id="nbtickets"></span> tickets vendus<b style="font-size:0;">,,,</b></th>
 				  <th style="text-align:right;"><?= $_total ?></th>
 				  <th style="text-align:right;" id="total"></th>
 				</tr>

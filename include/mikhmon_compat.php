@@ -1133,3 +1133,32 @@ if (!function_exists('mikhmon_sale_ymd')) {
     return $out;
   }
 }
+
+if (!function_exists('mikhmon_filter_sales_seller')) {
+  // Garde uniquement les ventes d'un vendeur : le commentaire du ticket
+  // (9e champ du nom de script) se termine par "-<vendeur>", même règle que la
+  // comptabilité (mikhmon_accounting_seller_key).
+  function mikhmon_filter_sales_seller($rows, $sellerKey, $sellersData)
+  {
+    $out = array();
+    foreach ((array) $rows as $row) {
+      $parts = explode('-|-', isset($row['name']) ? $row['name'] : '');
+      $comment = isset($parts[8]) ? $parts[8] : (isset($row['comment']) ? $row['comment'] : '');
+      if (mikhmon_accounting_seller_key($comment, $sellersData) === $sellerKey) {
+        $out[] = $row;
+      }
+    }
+    return $out;
+  }
+
+  // Somme des prix (4e champ) d'une liste de ventes.
+  function mikhmon_sales_total($rows)
+  {
+    $total = 0.0;
+    foreach ((array) $rows as $row) {
+      $parts = explode('-|-', isset($row['name']) ? $row['name'] : '');
+      $total += mikhmon_parse_money_amount(isset($parts[3]) ? $parts[3] : '0');
+    }
+    return $total;
+  }
+}
