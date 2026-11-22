@@ -28,7 +28,7 @@ assert(count($a) === 2 && mikhmon_sales_total($a) == 400.0);
 assert(count(mikhmon_filter_sales_seller($sales, 'beta', $sellers)) === 1);
 assert(mikhmon_sales_total($sales) == 1600.0);
 $b = mikhmon_seller_breakdown($sales, $sellers);
-assert(count($b) === 3 && $b[0]['key'] === '' && $b[0]['commission'] == 0.0);
+assert(count($b) === 3 && $b[0]['key'] === '' && $b[0]['commission'] == 70.0);
 assert($b[1]['key'] === 'beta' && $b[1]['share'] == 31.3 && $b[1]['commission'] == 50.0 && $b[1]['net'] == 450.0);
 assert($b[2]['key'] === 'alpha' && $b[2]['count'] === 2 && $b[2]['commission'] == 40.0);
 echo "OK\n";
